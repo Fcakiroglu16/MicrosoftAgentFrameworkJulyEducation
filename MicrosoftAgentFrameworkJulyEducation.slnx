@@ -1,1 +1,4 @@
-<Solution />
+<Solution>
+  <Project Path="App.API/App.API.csproj" />
+  <Project Path="ConsoleApp/App.Console.csproj" />
+</Solution>
