@@ -1,0 +1,98 @@
+using System.Text.Json;
+using App.API.Services;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Extensions.AI;
+using WebApplication.API.Data;
+
+namespace App.API.Endpoints;
+
+public static class ChatEndpoints
+{
+    private const string Instructions =
+        "Sen bir e-ticaret müşteri hizmetleri asistanısın. Ürünler hakkındaki soruları cevaplamak için verilen tool'ları kullan. Bilmediğin bilgileri uydurma; tool sonuçlarına dayan. Kısa, kibar ve Türkçe yanıt ver.";
+
+    public static void MapChatEndpoints(this IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/chatbot");
+
+        group.MapGet("/history",
+            async (string? conversationId, AppDbContext dbContext, CancellationToken cancellationToken) =>
+            {
+                if (string.IsNullOrWhiteSpace(conversationId))
+                {
+                    return Results.Ok(new List<ChatMessageDto>());
+                }
+
+
+                var dbState = await dbContext.ChatSessionStates.FindAsync([conversationId], cancellationToken);
+                if (dbState is null)
+                {
+                    return Results.Ok(new List<ChatMessageDto>());
+                }
+
+                var messages =
+                    JsonSerializer.Deserialize<List<ChatMessage>>(dbState.MessagesJson,
+                        AIJsonUtilities.DefaultOptions) ?? [];
+
+
+                var result = messages
+                    .Where(m => (m.Role == ChatRole.User || m.Role == ChatRole.Assistant) &&
+                                !string.IsNullOrEmpty(m.Text))
+                    .Select(m => new ChatMessageDto(m.Role.Value, m.Text))
+                    .ToList();
+
+
+                return Results.Ok(result);
+            });
+
+        group.MapPost("", async Task<Results<Ok<ChatResponse>, BadRequest<string>>>
+        (ChatRequest request, IChatClient chatClient, ProductTools productTools, AppDbContext dbContext,
+            CancellationToken cancellationToken) =>
+        {
+            if (string.IsNullOrWhiteSpace(request.Message))
+            {
+                return TypedResults.BadRequest("message is required.");
+            }
+
+            var conversationId = string.IsNullOrWhiteSpace(request.ConversationId)
+                ? Guid.NewGuid().ToString()
+                : request.ConversationId;
+
+
+            var dbState = await dbContext.ChatSessionStates.FindAsync([conversationId], cancellationToken);
+            List<ChatMessage> history = dbState is not null
+                ? JsonSerializer.Deserialize<List<ChatMessage>>(dbState.MessagesJson, AIJsonUtilities.DefaultOptions) ??
+                  []
+                : [];
+
+            history.Add(new ChatMessage(ChatRole.User, request.Message));
+
+            var chatOptions = new ChatOptions
+            {
+                Instructions = Instructions,
+                Tools = productTools.Tools
+            };
+
+            var response = await chatClient.GetResponseAsync(history, chatOptions, cancellationToken);
+
+            history.AddMessages(response);
+
+            if (dbState is null)
+            {
+                dbState = new ChatSessionState { ConversationId = conversationId };
+                dbContext.ChatSessionStates.Add(dbState);
+            }
+
+            dbState.MessagesJson = JsonSerializer.Serialize(history, AIJsonUtilities.DefaultOptions);
+
+
+            await dbContext.SaveChangesAsync(cancellationToken);
+
+            return TypedResults.Ok(new ChatResponse(conversationId, response.Text));
+        });
+    }
+}
+
+public sealed record ChatRequest(string Message, string? ConversationId = null);
+public sealed record ChatResponse(string ConversationId, string Reply);
+public sealed record ChatMessageDto(string Role, string Content);
