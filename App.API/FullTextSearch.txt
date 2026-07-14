@@ -1,0 +1,22 @@
+﻿SELECT FULLTEXTSERVICEPROPERTY('IsFullTextInstalled') AS IsFullTextInstalled;
+CREATE FULLTEXT CATALOG ProductCatalog AS DEFAULT;
+
+CREATE FULLTEXT INDEX ON dbo.Products
+(
+    Name LANGUAGE 1033    -- 1033 = English, 1055 = Turkish
+)
+KEY INDEX PK_Products
+ON ProductCatalog
+WITH CHANGE_TRACKING AUTO;
+GO
+
+
+
+SELECT Id, Name
+FROM dbo.Products
+WHERE CONTAINS(Name, N'"Bluetooth"');
+
+SELECT p.Id, p.Name, ft.RANK
+FROM CONTAINSTABLE(dbo.Products, Name, N'"Bluetooth"') ft
+JOIN dbo.Products p ON p.Id = ft.[KEY]
+ORDER BY ft.RANK DESC;
