@@ -5,14 +5,12 @@ using Microsoft.Data.SqlTypes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.AI;
 using OpenAI;
-using WebApplication.API.Data;
+using WebApplication.API.Endpoints;
 
 var builder = Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
-builder.Services.AddSingleton<ProductTools>();
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+
 builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -31,13 +29,19 @@ builder.Services.AddChatClient(
     .UseFunctionInvocation().UseLogging().UseOpenTelemetry(sourceName: "chat-client-source");
 
 ;
+builder.Services.AddEmbeddingGenerator(
+    openAiClient.GetEmbeddingClient("text-embedding-3-small").AsIEmbeddingGenerator());
 
-
+builder.Services.AddSingleton<PdfProcessingService>();
+builder.Services.AddSingleton<EmbeddingService>();
+builder.Services.AddScoped<RagService>();
+builder.Services.AddScoped<VectorSearchService>();
 var app = builder.Build();
 
 
 app.MapDefaultEndpoints();
 app.MapChatEndpoints();
+app.MapDocumentEndpoints();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

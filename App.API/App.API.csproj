@@ -17,10 +17,15 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.AI" Version="10.7.0" />
     <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="10.7.0" />
+    <PackageReference Include="UglyToad.PdfPig" Version="1.7.0-custom-5" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\MicrosoftAgentFrameworkJulyEducation.ServiceDefaults\MicrosoftAgentFrameworkJulyEducation.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\uploads\" />
   </ItemGroup>
 
 </Project>
