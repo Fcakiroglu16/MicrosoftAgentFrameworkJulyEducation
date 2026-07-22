@@ -1,12 +1,9 @@
-﻿using System.ClientModel.Primitives;
-using App.Console.OpenAI;
-using Azure.Identity;
-using Microsoft.Extensions.AI;
-using OpenAI;
+﻿
+using App.Console;
 
 Console.WriteLine("Microsoft Extensions AI Chat Client");
 
-var chatClient = new ChatClientWithOutput();
+await FunctionTool.Run();
 
-await chatClient.Run();
-
+// Proje Koordinatörü agent örneğini çalıştırmak için:
+// await ProjectCoordinatorAgent.Run();

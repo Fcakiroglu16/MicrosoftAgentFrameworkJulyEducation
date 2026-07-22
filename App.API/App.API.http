@@ -1,6 +1,20 @@
 @App.API_HostAddress = http://localhost:5074
 
-GET {{App.API_HostAddress}}/weatherforecast/
+
+###
+POST {{App.API_HostAddress}}/api/agent/non-streaming
+Content-Type: application/json
 Accept: application/json
 
+{
+  "prompt": "Yeni bir mobil uygulama geliştirme projesini adımlara böl."
+}
+###
+POST {{App.API_HostAddress}}/api/agent/streaming
+Content-Type: application/json
+Accept: application/json
+
+{
+  "prompt": "Yeni bir mobil uygulama geliştirme projesini adımlara böl."
+}
 ###
