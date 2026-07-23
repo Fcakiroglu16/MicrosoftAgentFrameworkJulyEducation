@@ -9,7 +9,10 @@
 
     <ItemGroup>
         <Content Include="bird.jpg">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <Content Include="fatih_cakiroglu_cv.pdf">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
 

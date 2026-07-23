@@ -59,6 +59,7 @@ public static class AllResponseContentAgent
                         funcResultCount++;
                         System.Console.WriteLine($"│  ├─ FunctionResultContent");
                         System.Console.WriteLine($"│  │    CallId: {fr.CallId}");
+                        System.Console.WriteLine($"│  │    Result: {fr.Result}");
                         break;
 
                     case UsageContent us:
