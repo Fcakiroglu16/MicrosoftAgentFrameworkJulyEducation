@@ -9,6 +9,7 @@ Accept: application/json
 {
   "prompt": "Yeni bir mobil uygulama geliştirme projesini adımlara böl."
 }
+
 ###
 POST {{App.API_HostAddress}}/api/agent/streaming
 Content-Type: application/json
@@ -17,4 +18,5 @@ Accept: application/json
 {
   "prompt": "Yeni bir mobil uygulama geliştirme projesini adımlara böl."
 }
+
 ###

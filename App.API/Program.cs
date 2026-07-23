@@ -1,27 +1,22 @@
-
-
 using System.Runtime.CompilerServices;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
 using OpenAI;
 
-var builder = Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
 builder.Services.AddOpenApi();
 
 
-
 var apiKey = Environment.GetEnvironmentVariable("OPEN_AI_KEY");
 if (string.IsNullOrWhiteSpace(apiKey))
-{
     throw new InvalidOperationException("Lütfen OPEN_AI_KEY ortam değişkenini ayarlayın.");
-}
 
 builder.Services.AddKeyedSingleton<AIAgent>("agent1", (_, _) =>
 {
-    IChatClient chatClient = new OpenAIClient(apiKey).GetChatClient("gpt-4o").AsIChatClient();
+    var chatClient = new OpenAIClient(apiKey).GetChatClient("gpt-4o").AsIChatClient();
 
     var agent = chatClient.AsAIAgent(new ChatClientAgentOptions
     {
@@ -45,7 +40,7 @@ builder.Services.AddKeyedSingleton<AIAgent>("agent1", (_, _) =>
 });
 builder.Services.AddKeyedSingleton<AIAgent>("agent2", (_, _) =>
 {
-    IChatClient chatClient = new OpenAIClient(apiKey).GetChatClient("gpt-4o").AsIChatClient();
+    var chatClient = new OpenAIClient(apiKey).GetChatClient("gpt-4o").AsIChatClient();
 
     var agent = chatClient.AsAIAgent(new ChatClientAgentOptions
     {
@@ -69,10 +64,9 @@ builder.Services.AddKeyedSingleton<AIAgent>("agent2", (_, _) =>
 });
 
 
-
-builder.Services.AddSingleton((_) =>
+builder.Services.AddSingleton(_ =>
 {
-    IChatClient chatClient = new OpenAIClient(apiKey).GetChatClient("gpt-4o").AsIChatClient();
+    var chatClient = new OpenAIClient(apiKey).GetChatClient("gpt-4o").AsIChatClient();
 
     var agent = chatClient.AsAIAgent(new ChatClientAgentOptions
     {
@@ -94,63 +88,46 @@ builder.Services.AddSingleton((_) =>
     });
     return agent;
 });
-
-
-
-
-
-
-
 
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+if (app.Environment.IsDevelopment()) app.MapOpenApi();
 
 
 var agentEndpoints = app.MapGroup("/api/agent");
 
 agentEndpoints.MapPost("/non-streaming", async (
-    AgentRequest request,
-    [FromKeyedServices("agent1")] AIAgent agent,    [FromKeyedServices("agent2")] AIAgent agent2,
-    CancellationToken cancellationToken) =>
-{
-    if (string.IsNullOrWhiteSpace(request.Prompt))
+        AgentRequest request,
+        [FromKeyedServices("agent1")] AIAgent agent, [FromKeyedServices("agent2")] AIAgent agent2,
+        CancellationToken cancellationToken) =>
     {
-        return Results.BadRequest(new { Message = "Prompt boş olamaz." });
-    }
+        if (string.IsNullOrWhiteSpace(request.Prompt))
+            return Results.BadRequest(new { Message = "Prompt boş olamaz." });
 
-    var response = await agent.RunAsync(
-        request.Prompt,
-        cancellationToken: cancellationToken);
+        var response = await agent.RunAsync(
+            request.Prompt,
+            cancellationToken: cancellationToken);
 
-    return Results.Ok(new AgentResponse(response.Text));
-})
-.WithName("RunAgentNonStreaming");
-
-
+        return Results.Ok(new AgentResponse(response.Text));
+    })
+    .WithName("RunAgentNonStreaming");
 
 
 agentEndpoints.MapPost("/streaming", IResult (
-    AgentRequest request,
-    ChatClientAgent agent,
-    CancellationToken cancellationToken) =>
-{
-    if (string.IsNullOrWhiteSpace(request.Prompt))
+        AgentRequest request,
+        ChatClientAgent agent,
+        CancellationToken cancellationToken) =>
     {
-        return Results.BadRequest(new { Message = "Prompt boş olamaz." });
-    }
+        if (string.IsNullOrWhiteSpace(request.Prompt))
+            return Results.BadRequest(new { Message = "Prompt boş olamaz." });
 
-    return TypedResults.ServerSentEvents(
-        StreamAgentUpdatesAsync(agent, request.Prompt, cancellationToken),
-        eventType: "agent-update");
-})
-.WithName("RunAgentStreaming");
-
+        return TypedResults.ServerSentEvents(
+            StreamAgentUpdatesAsync(agent, request.Prompt, cancellationToken),
+            "agent-update");
+    })
+    .WithName("RunAgentStreaming");
 
 
 app.Run();
@@ -162,11 +139,11 @@ static async IAsyncEnumerable<string> StreamAgentUpdatesAsync(
     [EnumeratorCancellation] CancellationToken cancellationToken)
 {
     await foreach (var update in agent.RunStreamingAsync(
-        prompt,
-        cancellationToken: cancellationToken))
-    {
+                       prompt,
+                       cancellationToken: cancellationToken))
         yield return update.ToString();
-    }
 }
+
 internal sealed record AgentRequest(string Prompt);
+
 internal sealed record AgentResponse(string Text);

@@ -1,9 +1,14 @@
-﻿
-using App.Console;
+﻿using App.Console;
+using App.Console.Agents;
+using App.Console.Agents.MessageTypes;
+using Microsoft.Agents.AI;
 
 Console.WriteLine("Microsoft Extensions AI Chat Client");
 
-await FunctionTool.Run();
+//await FunctionTool.Run();
 
-// Proje Koordinatörü agent örneğini çalıştırmak için:
-// await ProjectCoordinatorAgent.Run();
+var agent= AgentSetup.GetAgent();
+
+//await TextContentInResponseAgent.RunAsync(agent);
+//await AllResponseContentAgent.RunAsync(agent);
+await MultiModelContentAgent.RunAsync(agent);

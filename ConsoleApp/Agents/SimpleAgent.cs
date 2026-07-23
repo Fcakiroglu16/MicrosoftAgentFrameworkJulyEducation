@@ -4,13 +4,13 @@ using OpenAI;
 
 namespace App.Console;
 
-public static class ProjectCoordinatorAgent
+public static class SimpleAgent
 {
     public static async Task Run()
     {
         var apiKey = Environment.GetEnvironmentVariable("OPEN_AI_KEY")
-            ?? throw new InvalidOperationException(
-                "Lütfen OPEN_AI_KEY ortam değişkenini ayarlayın.");
+                     ?? throw new InvalidOperationException(
+                         "Lütfen OPEN_AI_KEY ortam değişkenini ayarlayın.");
 
         // Microsoft.Extensions.AI.OpenAI üzerinden IChatClient oluşturma
         var chatClient = new OpenAIClient(apiKey).GetChatClient("gpt-4o").AsIChatClient();
@@ -19,7 +19,8 @@ public static class ProjectCoordinatorAgent
         var agent = chatClient.AsAIAgent(new ChatClientAgentOptions
         {
             Name = "ProjeKoordinatoru",
-            Description = "Karmaşık iş ve projeleri gerçek dünya koşullarına uygun, net ve uygulanabilir adımlara bölen bir yapay zeka asistanı.",
+            Description =
+                "Karmaşık iş ve projeleri gerçek dünya koşullarına uygun, net ve uygulanabilir adımlara bölen bir yapay zeka asistanı.",
             ChatOptions = new ChatOptions
             {
                 Instructions = """
