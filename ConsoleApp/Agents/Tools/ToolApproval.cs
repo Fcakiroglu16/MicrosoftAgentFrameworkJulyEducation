@@ -46,6 +46,8 @@ public static class ToolApproval
         // Yanıt metin yerine FunctionApprovalRequestContent içerecektir.
         AgentResponse response = await agent.RunAsync(prompt);
 
+        
+        
         // Yanıt mesajlarından bekleyen tüm onay isteklerini çıkar.
         var approvalRequests = response.Messages
             .SelectMany(m => m.Contents)
@@ -72,7 +74,7 @@ public static class ToolApproval
         }
 
         System.Console.Write("\nOnaylıyor musunuz? (e/h): ");
-        bool approved = true;//System.Console.ReadLine()?.Trim().ToLower() == "e";
+        bool approved = System.Console.ReadLine()?.Trim().ToLower() == "e";
 
         // ── 2. Tur ───────────────────────────────────────────────────────────
         // Tüm onay/ret yanıtlarını bir araya getiren tek bir ChatMessage oluştur.
