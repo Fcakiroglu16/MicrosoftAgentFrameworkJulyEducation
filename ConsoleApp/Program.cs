@@ -14,6 +14,7 @@ Console.WriteLine("Microsoft Extensions AI Chat Client");
 //await AllResponseContentAgent.RunAsync(agent);
 //await MultiModelContentAgent.RunAsync(agent);
 //await CvExtraction.RunAsync();
-#pragma warning disable OPENAI001
-await CodeInterpreterHostedTool.RunAsync();
-#pragma warning restore OPENAI001
+// #pragma warning disable OPENAI001
+// await CodeInterpreterHostedTool.RunAsync();
+// #pragma warning restore OPENAI001
+await ToolApproval.RunAsync();
