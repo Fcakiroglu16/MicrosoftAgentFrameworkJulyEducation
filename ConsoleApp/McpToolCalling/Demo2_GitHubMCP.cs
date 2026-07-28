@@ -18,7 +18,6 @@ public static class GitHubMcp
                 "Set the GITHUB_PAT environment variable. " +
                 "Create a token at https://github.com/settings/tokens");
 
-
         System.Console.WriteLine("Connecting to GitHub MCP server...");
 
         await using var mcpClient = await McpClient.CreateAsync(
@@ -51,21 +50,24 @@ public static class GitHubMcp
         
         AgentSession session = await agent.CreateSessionAsync();
 
-        // Turn 1 — Discover repositories
-        System.Console.WriteLine("Turn 1: Searching for Agent Framework repositories...");
-        var response1 = await agent.RunAsync(
-            "Search GitHub for public repositories about 'Microsoft Agent Framework'. " +
-            "List the top 3 results with their descriptions and star counts.",
-            session);
-
-        System.Console.WriteLine("Agent:");
-        System.Console.WriteLine(response1);
-        System.Console.WriteLine();
+        // // Turn 1 — Discover repositories
+        // System.Console.WriteLine("Turn 1: Searching for Agent Framework repositories...");
+        // var response1 = await agent.RunAsync(
+        //     "Search GitHub for public repositories about 'Microsoft Agent Framework'. " +
+        //     "List the top 3 results with their descriptions and star counts.",
+        //     session);
+        //
+        // System.Console.WriteLine("Agent:");
+        // System.Console.WriteLine(response1);
+        // System.Console.WriteLine();
 
         // Turn 2 — List the authenticated user's private repositories, sorted by name
         System.Console.WriteLine("Turn 2: Listing private repositories (sorted)...");
         var response2 = await agent.RunAsync(
-            "List all private repositories owned by the authenticated GitHub user. " +
+            "Use the authenticated GitHub user's own repository listing tool " +
+            "(not a generic code/repo search) to fetch repositories for the " +
+            "currently authenticated user, filtered to visibility=private " +
+            "(or affiliation=owner with is:private). " +
             "Sort them alphabetically by repository name. " +
             "Return ONLY the repository names, one per line, with no numbering, " +
             "no descriptions and no extra commentary.",
