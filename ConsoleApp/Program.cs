@@ -1,7 +1,9 @@
 ﻿using App.Console.Agents;
+using App.Console.McpToolCalling;
 using Microsoft.Agents.AI;
 
 Console.WriteLine("Microsoft Extensions AI Chat Client");
 
 
-var agent= AgentSetup.GetAgent();
+//await MicrosoftLearnMcp.RunAsync(Environment.GetEnvironmentVariable("OPEN_AI_KEY")!);
+await GitHubMcp.RunAsync(Environment.GetEnvironmentVariable("OPEN_AI_KEY")!);
