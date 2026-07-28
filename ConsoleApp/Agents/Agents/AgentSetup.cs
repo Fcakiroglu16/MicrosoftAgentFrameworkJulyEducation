@@ -19,10 +19,9 @@ public static class AgentSetup
 
     public static ChatClientAgent GetAgent()
     {
-
         var chatClient = CreateChatClient();
-        
-        
+
+
         return chatClient.AsAIAgent(new ChatClientAgentOptions
         {
             Name = "GeneralAssistant",
@@ -39,6 +38,9 @@ public static class AgentSetup
             }
         });
     }
+
     public static string? Truncate(string? text, int maxLength = 80)
-        => text?.Length > maxLength ? string.Concat(text.AsSpan(0, maxLength), "...") : text;
+    {
+        return text?.Length > maxLength ? string.Concat(text.AsSpan(0, maxLength), "...") : text;
+    }
 }

@@ -34,18 +34,13 @@ public static class SimpleAgentAsOpenTelemetry
                                """
             }
         });
-        
-       var agent= new AIAgentBuilder(innerAgent)
+
+        var agent = new AIAgentBuilder(innerAgent)
             .UseOpenTelemetry(
-                sourceName: "agent-source-name",
-                configure: otelAgent => otelAgent.EnableSensitiveData = true)
+                "agent-source-name",
+                otelAgent => otelAgent.EnableSensitiveData = true)
             .Build();
-        
-        
-        
-        
-        
-        
+
 
         // Agent Framework üzerinden isteği çalıştırma
         var response = await agent.RunAsync(

@@ -12,11 +12,17 @@ public static class AllResponseContentAgent
         System.Console.WriteLine("╚═══════════════════════════════════════════════╝\n");
 
         const string prompt = "Asp.net Core Framework nedir?";
-        AgentResponse response = await agent.RunAsync(prompt);
+        var response = await agent.RunAsync(prompt);
 
         System.Console.WriteLine($"Messages in response: {response.Messages.Count}\n");
 
-        int textCount = 0, dataCount = 0, uriCount = 0, funcCallCount = 0, funcResultCount = 0, usageCount = 0, otherCount = 0;
+        int textCount = 0,
+            dataCount = 0,
+            uriCount = 0,
+            funcCallCount = 0,
+            funcResultCount = 0,
+            usageCount = 0,
+            otherCount = 0;
 
         foreach (var message in response.Messages)
         {
@@ -24,32 +30,31 @@ public static class AllResponseContentAgent
             System.Console.WriteLine($"│  Content items: {message.Contents.Count}");
 
             foreach (var content in message.Contents)
-            {
                 switch (content)
                 {
                     case TextContent tc:
                         textCount++;
-                        System.Console.WriteLine($"│  ├─ TextContent");
+                        System.Console.WriteLine("│  ├─ TextContent");
                         System.Console.WriteLine($"│  │    Text: \"{AgentSetup.Truncate(tc.Text)}\"");
                         break;
 
                     case DataContent dc:
                         dataCount++;
-                        System.Console.WriteLine($"│  ├─ DataContent");
+                        System.Console.WriteLine("│  ├─ DataContent");
                         System.Console.WriteLine($"│  │    MediaType: {dc.MediaType}");
                         System.Console.WriteLine($"│  │    HasData: {dc.Data.Length > 0}");
                         break;
 
                     case UriContent urc:
                         uriCount++;
-                        System.Console.WriteLine($"│  ├─ UriContent");
+                        System.Console.WriteLine("│  ├─ UriContent");
                         System.Console.WriteLine($"│  │    Uri: {urc.Uri}");
-               
+
                         break;
 
                     case FunctionCallContent fc:
                         funcCallCount++;
-                        System.Console.WriteLine($"│  ├─ FunctionCallContent");
+                        System.Console.WriteLine("│  ├─ FunctionCallContent");
                         System.Console.WriteLine($"│  │    Name: {fc.Name}");
                         System.Console.WriteLine($"│  │    CallId: {fc.CallId}");
                         System.Console.WriteLine($"│  │    Arguments: {fc.Arguments}");
@@ -57,15 +62,16 @@ public static class AllResponseContentAgent
 
                     case FunctionResultContent fr:
                         funcResultCount++;
-                        System.Console.WriteLine($"│  ├─ FunctionResultContent");
+                        System.Console.WriteLine("│  ├─ FunctionResultContent");
                         System.Console.WriteLine($"│  │    CallId: {fr.CallId}");
                         System.Console.WriteLine($"│  │    Result: {fr.Result}");
                         break;
 
                     case UsageContent us:
                         usageCount++;
-                        System.Console.WriteLine($"│  ├─ UsageContent");
-                        System.Console.WriteLine($"│  │    Input: {us.Details.InputTokenCount}, Output: {us.Details.OutputTokenCount}");
+                        System.Console.WriteLine("│  ├─ UsageContent");
+                        System.Console.WriteLine(
+                            $"│  │    Input: {us.Details.InputTokenCount}, Output: {us.Details.OutputTokenCount}");
                         break;
 
                     default:
@@ -73,7 +79,6 @@ public static class AllResponseContentAgent
                         System.Console.WriteLine($"│  ├─ {content.GetType().Name} (unknown/custom)");
                         break;
                 }
-            }
 
             System.Console.WriteLine("└──────────────────────────────────");
         }

@@ -6,17 +6,15 @@ using OpenAI;
 namespace App.Console.Agents.Tools;
 
 /// <summary>
-/// Ders 10 — Barındırılan Araçlar
-/// Demo 2: Sorunları çözmek için korumalı bir ortamda kod yazıp çalıştırabilen,
-/// barındırılan Code Interpreter aracını kullanan basit bir ajan.
+///     Ders 10 — Barındırılan Araçlar
+///     Demo 2: Sorunları çözmek için korumalı bir ortamda kod yazıp çalıştırabilen,
+///     barındırılan Code Interpreter aracını kullanan basit bir ajan.
 /// </summary>
 public static class CodeInterpreterHostedTool
 {
     [Experimental("OPENAI001")]
     public static async Task RunAsync()
     {
-        
-        
         var apiKey = Environment.GetEnvironmentVariable("OPEN_AI_KEY")
                      ?? throw new InvalidOperationException(
                          "Lütfen OPEN_AI_KEY ortam değişkenini ayarlayın.");
@@ -28,7 +26,7 @@ public static class CodeInterpreterHostedTool
             .GetResponsesClient()
             .AsIChatClient("gpt-4o-mini")
             .AsAIAgent(
-                instructions: "Kod yazıp çalıştırabilen yardımcı bir asistansın.",
+                "Kod yazıp çalıştırabilen yardımcı bir asistansın.",
                 tools: [new HostedCodeInterpreterTool()]);
 
         System.Console.WriteLine("Soru: 1 ile 50 arasındaki sayıları topla.");

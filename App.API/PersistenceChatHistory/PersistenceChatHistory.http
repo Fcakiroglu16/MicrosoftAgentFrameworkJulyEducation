@@ -1,0 +1,25 @@
+@API_HostAddress = http://localhost:5074
+
+
+###
+# Yeni bir konuşma başlatır (EF Core ile kalıcı geçmiş, conversationId belirtilmezse otomatik oluşturulur)
+POST {{API_HostAddress}}/chat-with-persistence
+Content-Type: application/json
+Accept: application/json
+
+{
+  "message": "Merhaba ben fatih"
+}
+
+###
+# Var olan bir konuşmaya devam eder (conversationId ile aynı oturumun geçmişi DB'den yüklenir)
+POST {{API_HostAddress}}/chat-with-persistence
+Content-Type: application/json
+Accept: application/json
+
+{
+  "message": "Az önce ne sordum?",
+  "conversationId": "5f5e43f9-acee-4459-8bbd-d20df06540bf"
+}
+
+###

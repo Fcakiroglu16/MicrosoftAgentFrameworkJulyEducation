@@ -5,7 +5,6 @@ using OpenAI;
 
 namespace App.Console.Agents.StructuredOutput;
 
-
 public static class StructuredOutputSetup
 {
     public static IChatClient CreateChatClient()
@@ -19,7 +18,7 @@ public static class StructuredOutputSetup
             .AsIChatClient();
     }
 
-  
+
     public static ChatClientAgent CreateStructuredAgent<T>(
         IChatClient chatClient,
         string agentName,
@@ -27,15 +26,15 @@ public static class StructuredOutputSetup
         string schemaDescription)
     {
         // Create JSON schema from the type
-        JsonElement schema = AIJsonUtilities.CreateJsonSchema(typeof(T));
+        var schema = AIJsonUtilities.CreateJsonSchema(typeof(T));
 
         // Configure chat options to use structured output
         var chatOptions = new ChatOptions
         {
             ResponseFormat = ChatResponseFormat.ForJsonSchema(
-                schema: schema,
-                schemaName: typeof(T).Name,
-                schemaDescription: schemaDescription)
+                schema,
+                typeof(T).Name,
+                schemaDescription)
         };
 
         return chatClient.AsAIAgent(new ChatClientAgentOptions
@@ -47,7 +46,7 @@ public static class StructuredOutputSetup
     }
 
     /// <summary>
-    /// Pretty print JSON object
+    ///     Pretty print JSON object
     /// </summary>
     public static void PrintJson<T>(T obj) where T : class
     {

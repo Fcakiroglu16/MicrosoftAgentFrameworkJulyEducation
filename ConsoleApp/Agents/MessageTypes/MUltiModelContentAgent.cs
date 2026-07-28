@@ -4,9 +4,8 @@ using Microsoft.Extensions.AI;
 namespace App.Console.Agents.MessageTypes;
 
 /// <summary>
-/// DEMO 1 — Basic Image Analysis
-///
-/// Demonstrates sending a local image file to an agent using DataContent.
+///     DEMO 1 — Basic Image Analysis
+///     Demonstrates sending a local image file to an agent using DataContent.
 /// </summary>
 public static class MultiModelContentAgent
 {

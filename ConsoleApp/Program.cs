@@ -1,9 +1,4 @@
-﻿using App.Console;
-using App.Console.Agents;
-using App.Console.Agents.MessageTypes;
-using App.Console.Agents.StructuredOutput;
-using App.Console.Agents.Tools;
-using Microsoft.Agents.AI;
+﻿using App.Console.Agents.Tools;
 
 Console.WriteLine("Microsoft Extensions AI Chat Client");
 

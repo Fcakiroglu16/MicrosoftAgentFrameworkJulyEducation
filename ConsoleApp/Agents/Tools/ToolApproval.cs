@@ -5,14 +5,16 @@ using OpenAI;
 
 namespace App.Console.Agents.Tools;
 
-
 public static class ToolApproval
 {
     // ── Function Tool ────────────────────────────────────────────────────────
     [Description("Belirtilen konum için güncel hava durumunu getirir.")]
-    static string GetWeather(
-        [Description("Hava durumu sorgulanacak şehir veya konum.")] string location)
-        => $"{location} için hava durumu: bulutlu, en yüksek 15°C.";
+    private static string GetWeather(
+        [Description("Hava durumu sorgulanacak şehir veya konum.")]
+        string location)
+    {
+        return $"{location} için hava durumu: bulutlu, en yüksek 15°C.";
+    }
 
     public static async Task RunAsync()
     {
@@ -21,22 +23,20 @@ public static class ToolApproval
         System.Console.WriteLine("╚═══════════════════════════════════════════════╝\n");
 
         var apiKey = Environment.GetEnvironmentVariable("OPEN_AI_KEY")
-            ?? throw new InvalidOperationException(
-                "Bu demoyu çalıştırmadan önce OPEN_AI_KEY ortam değişkenini ayarlayın.");
+                     ?? throw new InvalidOperationException(
+                         "Bu demoyu çalıştırmadan önce OPEN_AI_KEY ortam değişkenini ayarlayın.");
 
-     
-        AIFunction weatherTool = AIFunctionFactory.Create(GetWeather);
+
+        var weatherTool = AIFunctionFactory.Create(GetWeather);
         AIFunction approvalRequiredWeatherTool = new ApprovalRequiredAIFunction(weatherTool);
 
         AIAgent agent = new OpenAIClient(apiKey)
             .GetChatClient("gpt-4o")
             .AsIChatClient()
             .AsAIAgent(
-                instructions: "Yardımcı bir asistansın. Gerektiğinde mevcut araçları kullan.",
+                "Yardımcı bir asistansın. Gerektiğinde mevcut araçları kullan.",
                 tools: [approvalRequiredWeatherTool]);
 
-     
-      
 
         const string prompt = "Ankara'da hava nasıl?";
         System.Console.WriteLine($"Prompt  : {prompt}\n");
@@ -44,10 +44,9 @@ public static class ToolApproval
         // ── 1. Tur ───────────────────────────────────────────────────────────
         // Ajan GetWeather'ı çağırması gerektiğini fark eder ancak henüz çalıştıramaz.
         // Yanıt metin yerine FunctionApprovalRequestContent içerecektir.
-        AgentResponse response = await agent.RunAsync(prompt);
+        var response = await agent.RunAsync(prompt);
 
-        
-        
+
         // Yanıt mesajlarından bekleyen tüm onay isteklerini çıkar.
         var approvalRequests = response.Messages
             .SelectMany(m => m.Contents)
@@ -74,7 +73,7 @@ public static class ToolApproval
         }
 
         System.Console.Write("\nOnaylıyor musunuz? (e/h): ");
-        bool approved = System.Console.ReadLine()?.Trim().ToLower() == "e";
+        var approved = System.Console.ReadLine()?.Trim().ToLower() == "e";
 
         // ── 2. Tur ───────────────────────────────────────────────────────────
         // Tüm onay/ret yanıtlarını bir araya getiren tek bir ChatMessage oluştur.
@@ -83,9 +82,9 @@ public static class ToolApproval
             .Select(req => req.CreateResponse(approved))
             .ToArray<AIContent>();
 
-        
+
         var approvalMessage = new ChatMessage(ChatRole.User, approvalContents);
-        AgentResponse finalResponse = await agent.RunAsync(approvalMessage);
+        var finalResponse = await agent.RunAsync(approvalMessage);
 
         System.Console.WriteLine(approved
             ? $"\nOnaylandı — Yanıt: {finalResponse.Text}"

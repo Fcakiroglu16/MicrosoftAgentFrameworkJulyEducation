@@ -16,7 +16,7 @@ public static class SimpleAgentAsResponseAPIAsResponseAPI
 
         // Microsoft.Extensions.AI.OpenAI üzerinden IChatClient oluşturma
         var chatClient = new OpenAIClient(apiKey).GetResponsesClient().AsIChatClient("gpt-4o");
-        
+
         // Sistem talimatlarıyla ChatClientAgent oluşturma
         var agent = chatClient.AsAIAgent(new ChatClientAgentOptions
         {

@@ -6,9 +6,9 @@ using OpenAI;
 namespace App.Console.Agents.Tools;
 
 /// <summary>
-/// Lesson 10 — Hosted Tools
-/// Demo 1: Simple agent using the hosted Web Search tool so it can answer
-/// questions about current events using live information from the web.
+///     Lesson 10 — Hosted Tools
+///     Demo 1: Simple agent using the hosted Web Search tool so it can answer
+///     questions about current events using live information from the web.
 /// </summary>
 public static class WebSearchHostedTool
 {
@@ -26,7 +26,7 @@ public static class WebSearchHostedTool
             .GetResponsesClient()
             .AsIChatClient("gpt-4o-mini")
             .AsAIAgent(
-                instructions: "You are a helpful assistant that can search the web for current information.",
+                "You are a helpful assistant that can search the web for current information.",
                 tools: [new HostedWebSearchTool()]);
 
         System.Console.WriteLine("Question: What is the current weather in Seattle?");
