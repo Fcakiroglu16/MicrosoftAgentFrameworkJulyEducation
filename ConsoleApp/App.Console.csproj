@@ -24,4 +24,8 @@
         <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="10.7.0"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Agents\Session\" />
+    </ItemGroup>
+
 </Project>

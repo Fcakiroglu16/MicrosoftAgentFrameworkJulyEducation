@@ -19,7 +19,12 @@ Accept: application/json
 
 {
   "message": "Az önce ne sordum?",
-  "conversationId": "5f5e43f9-acee-4459-8bbd-d20df06540bf"
+  "conversationId": "6e893985-0fa0-4db4-bee5-e70c4c4cf374"
 }
+
+###
+# Belirli bir conversationId'ye ait tüm sohbet geçmişini DB'den okur
+GET {{API_HostAddress}}/chat-with-persistence/history/6e893985-0fa0-4db4-bee5-e70c4c4cf374
+Accept: application/json
 
 ###

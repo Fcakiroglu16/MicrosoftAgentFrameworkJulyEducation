@@ -1,6 +1,8 @@
+using System.Text.Json;
 using Microsoft.Agents.AI;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.AI;
 
 namespace App.API.PersistenceChatHistory;
 
@@ -37,6 +39,25 @@ public static class PersistenceChatHistoryEndpoints
 
             return TypedResults.Ok(new ChatResponse(conversationId, response.Text));
         });
+
+        // 5. Belirli bir conversationId'ye ait geçmiş sohbeti DB'den okuyup döner.
+        app.MapGet("/chat-with-persistence/history/{conversationId}",
+            async Task<Results<Ok<ChatHistoryResponse>, NotFound>>
+            (string conversationId, ChatHistoryDbContext dbContext, CancellationToken cancellationToken) =>
+            {
+                var dbState = await dbContext.ChatSessionStates.FindAsync([conversationId], cancellationToken);
+                if (dbState == null)
+                {
+                    return TypedResults.NotFound();
+                }
+
+                var messages = JsonSerializer.Deserialize<List<ChatMessage>>(dbState.MessagesJson) ?? [];
+                var dtos = messages
+                    .Select(m => new ChatMessageDto(m.Role.Value, m.Text))
+                    .ToList();
+
+                return TypedResults.Ok(new ChatHistoryResponse(conversationId, dtos));
+            });
 
         return app;
     }
