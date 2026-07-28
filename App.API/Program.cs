@@ -1,4 +1,5 @@
 using App.API.InMemoryChatHistory;
+using App.API.ManagedStorageChatHistory;
 using App.API.PersistenceChatHistory;
 using Microsoft.Extensions.AI;
 using OpenAI;
@@ -18,6 +19,7 @@ builder.Services.AddChatClient(openAiClient.GetChatClient("gpt-4o-mini").AsIChat
 
 builder.Services.AddInMemoryChatHistoryAgent();
 builder.Services.AddPersistenceChatHistoryAgent();
+builder.Services.AddManagedStorageChatHistoryAgent(openAiClient);
 
 
 
@@ -30,5 +32,6 @@ if (app.Environment.IsDevelopment()) app.MapOpenApi();
 
 app.MapInMemoryChatHistoryEndpoints();
 app.MapPersistenceChatHistoryEndpoints();
+app.MapManagedStorageChatHistoryEndpoints();
 
 app.Run();

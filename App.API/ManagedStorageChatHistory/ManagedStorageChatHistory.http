@@ -1,0 +1,25 @@
+@API_HostAddress = http://localhost:5074
+
+
+###
+# Yeni bir konuşma başlatır (servis-yönetimli geçmiş, conversationId belirtilmezse otomatik oluşturulur)
+POST {{API_HostAddress}}/chat-with-managed-storage
+Content-Type: application/json
+Accept: application/json
+
+{
+  "message": "Merhaba ben fatih"
+}
+
+###
+# Var olan bir konuşmaya devam eder (conversationId ile aynı OpenAI servis konuşması sürdürülür)
+POST {{API_HostAddress}}/chat-with-managed-storage
+Content-Type: application/json
+Accept: application/json
+
+{
+  "message": "Az önce ne sordum?",
+  "conversationId": "resp_0db0507f4c948c9d006a68c2e4d97481918db1fb50bb545731"
+}
+
+###
