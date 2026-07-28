@@ -1,22 +1,30 @@
-@App.API_HostAddress = http://localhost:5074
+@API_HostAddress = http://localhost:5074
 
 
 ###
-POST {{App.API_HostAddress}}/api/agent/non-streaming
+# Yeni bir konuşma başlatır (conversationId belirtilmezse otomatik oluşturulur)
+POST {{API_HostAddress}}/chat
 Content-Type: application/json
 Accept: application/json
 
 {
-  "prompt": "Yeni bir mobil uygulama geliştirme projesini adımlara böl."
+  "message": "Merhaba ben fatih"
 }
 
 ###
-POST {{App.API_HostAddress}}/api/agent/streaming
+# Var olan bir konuşmaya devam eder (conversationId ile aynı oturumun geçmişi korunur)
+POST {{API_HostAddress}}/chat
 Content-Type: application/json
 Accept: application/json
 
 {
-  "prompt": "Yeni bir mobil uygulama geliştirme projesini adımlara böl."
+  "message": "Az önce ne sordum?",
+  "conversationId": "f3faa96d-a3b8-4054-97d3-4edf768d6aee"
 }
+
+###
+# Belirtilen konuşmanın mesaj geçmişini getirir
+GET {{API_HostAddress}}/chat/f3faa96d-a3b8-4054-97d3-4edf768d6aee/history
+Accept: application/json
 
 ###

@@ -1,149 +1,27 @@
-using System.Runtime.CompilerServices;
-using Microsoft.Agents.AI;
-using Microsoft.Extensions.AI;
-using OpenAI;
+using App.API.InMemoryChatHistory;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
-
+builder.Services.AddMemoryCache();
 builder.Services.AddOpenApi();
 
 
-var apiKey = Environment.GetEnvironmentVariable("OPEN_AI_KEY");
-if (string.IsNullOrWhiteSpace(apiKey))
-    throw new InvalidOperationException("Lütfen OPEN_AI_KEY ortam değişkenini ayarlayın.");
 
-builder.Services.AddKeyedSingleton<AIAgent>("agent1", (_, _) =>
-{
-    var chatClient = new OpenAIClient(apiKey).GetChatClient("gpt-4o").AsIChatClient();
+// OpenAI
+var openAiKey = Environment.GetEnvironmentVariable("OPEN_AI_KEY")
+                ?? throw new InvalidOperationException("OPEN_AI_KEY environment variable is not set.");
 
-    var agent = chatClient.AsAIAgent(new ChatClientAgentOptions
-    {
-        Name = "ProjeKoordinatoru",
-        Description =
-            "Karmaşık iş ve projeleri gerçek dünya koşullarına uygun, net ve uygulanabilir adımlara bölen bir yapay zeka asistanı.",
-        ChatOptions = new ChatOptions
-        {
-            Instructions = """
-                           Sen deneyimli bir proje koordinatörüsün.
-                           Kullanıcının verdiği her işi gerçek dünya koşullarına uygun,
-                           net, ölçülebilir ve sıralı adımlara böl.
-                           Her adımda sorumlu rolü, tahmini süreyi,
-                           ihtiyaç duyulan kaynakları ve olası riskleri belirt.
-                           Teknik jargon kullanma; tüm paydaşların anlayabileceği
-                           açık ve profesyonel bir dille yaz.
-                           """
-        }
-    });
-    return agent;
-});
-builder.Services.AddKeyedSingleton<AIAgent>("agent2", (_, _) =>
-{
-    var chatClient = new OpenAIClient(apiKey).GetChatClient("gpt-4o").AsIChatClient();
+builder.Services.AddInMemoryChatHistoryAgent(openAiKey);
 
-    var agent = chatClient.AsAIAgent(new ChatClientAgentOptions
-    {
-        Name = "ProjeKoordinatoru",
-        Description =
-            "Karmaşık iş ve projeleri gerçek dünya koşullarına uygun, net ve uygulanabilir adımlara bölen bir yapay zeka asistanı.",
-        ChatOptions = new ChatOptions
-        {
-            Instructions = """
-                           Sen deneyimli bir proje koordinatörüsün.
-                           Kullanıcının verdiği her işi gerçek dünya koşullarına uygun,
-                           net, ölçülebilir ve sıralı adımlara böl.
-                           Her adımda sorumlu rolü, tahmini süreyi,
-                           ihtiyaç duyulan kaynakları ve olası riskleri belirt.
-                           Teknik jargon kullanma; tüm paydaşların anlayabileceği
-                           açık ve profesyonel bir dille yaz.
-                           """
-        }
-    });
-    return agent;
-});
-
-
-builder.Services.AddSingleton(_ =>
-{
-    var chatClient = new OpenAIClient(apiKey).GetChatClient("gpt-4o").AsIChatClient();
-
-    var agent = chatClient.AsAIAgent(new ChatClientAgentOptions
-    {
-        Name = "ProjeKoordinatoru",
-        Description =
-            "Karmaşık iş ve projeleri gerçek dünya koşullarına uygun, net ve uygulanabilir adımlara bölen bir yapay zeka asistanı.",
-        ChatOptions = new ChatOptions
-        {
-            Instructions = """
-                           Sen deneyimli bir proje koordinatörüsün.
-                           Kullanıcının verdiği her işi gerçek dünya koşullarına uygun,
-                           net, ölçülebilir ve sıralı adımlara böl.
-                           Her adımda sorumlu rolü, tahmini süreyi,
-                           ihtiyaç duyulan kaynakları ve olası riskleri belirt.
-                           Teknik jargon kullanma; tüm paydaşların anlayabileceği
-                           açık ve profesyonel bir dille yaz.
-                           """
-        }
-    });
-    return agent;
-});
 
 
 var app = builder.Build();
 
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) app.MapOpenApi();
 
-
-var agentEndpoints = app.MapGroup("/api/agent");
-
-agentEndpoints.MapPost("/non-streaming", async (
-        AgentRequest request,
-        [FromKeyedServices("agent1")] AIAgent agent, [FromKeyedServices("agent2")] AIAgent agent2,
-        CancellationToken cancellationToken) =>
-    {
-        if (string.IsNullOrWhiteSpace(request.Prompt))
-            return Results.BadRequest(new { Message = "Prompt boş olamaz." });
-
-        var response = await agent.RunAsync(
-            request.Prompt,
-            cancellationToken: cancellationToken);
-
-        return Results.Ok(new AgentResponse(response.Text));
-    })
-    .WithName("RunAgentNonStreaming");
-
-
-agentEndpoints.MapPost("/streaming", IResult (
-        AgentRequest request,
-        ChatClientAgent agent,
-        CancellationToken cancellationToken) =>
-    {
-        if (string.IsNullOrWhiteSpace(request.Prompt))
-            return Results.BadRequest(new { Message = "Prompt boş olamaz." });
-
-        return TypedResults.ServerSentEvents(
-            StreamAgentUpdatesAsync(agent, request.Prompt, cancellationToken),
-            "agent-update");
-    })
-    .WithName("RunAgentStreaming");
-
+app.MapInMemoryChatHistoryEndpoints();
 
 app.Run();
-
-
-static async IAsyncEnumerable<string> StreamAgentUpdatesAsync(
-    ChatClientAgent agent,
-    string prompt,
-    [EnumeratorCancellation] CancellationToken cancellationToken)
-{
-    await foreach (var update in agent.RunStreamingAsync(
-                       prompt,
-                       cancellationToken: cancellationToken))
-        yield return update.ToString();
-}
-
-internal sealed record AgentRequest(string Prompt);
-
-internal sealed record AgentResponse(string Text);
