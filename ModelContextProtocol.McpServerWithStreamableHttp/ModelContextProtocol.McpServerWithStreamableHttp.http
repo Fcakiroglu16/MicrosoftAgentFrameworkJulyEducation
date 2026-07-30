@@ -1,0 +1,6 @@
+@ModelContextProtocol.McpServerWithStreamableHttp_HostAddress = http://localhost:5038
+
+GET {{ModelContextProtocol.McpServerWithStreamableHttp_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

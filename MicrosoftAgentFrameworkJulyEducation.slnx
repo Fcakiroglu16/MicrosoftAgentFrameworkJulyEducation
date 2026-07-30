@@ -4,4 +4,5 @@
     <Project Path="MicrosoftAgentFrameworkJulyEducation.AppHost/MicrosoftAgentFrameworkJulyEducation.AppHost.csproj" Id="77d5b4e6-b090-44f1-af44-71145313df1c" />
     <Project Path="MicrosoftAgentFrameworkJulyEducation.ServiceDefaults/MicrosoftAgentFrameworkJulyEducation.ServiceDefaults.csproj" />
     <Project Path="ModelContextProtocol.McpServerWithStdio\ModelContextProtocol.McpServerWithStdio.csproj" />
+    <Project Path="ModelContextProtocol.McpServerWithStreamableHttp/ModelContextProtocol.McpServerWithStreamableHttp.csproj" />
 </Solution>

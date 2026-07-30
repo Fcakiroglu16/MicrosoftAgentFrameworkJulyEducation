@@ -4,27 +4,23 @@ using ModelContextProtocol.Client;
 using ModelContextProtocol.Protocol;
 using OpenAI;
 
-namespace App.Console.McpToolCalling.Agents;
+namespace App.Console.McpToolCalling.AgentsWithStreamableHttp;
 
 
-public static class McpToolAgent
+public static class McpToolAgentWithStreamableHttp
 {
     public static async Task RunAsync(string apiKey)
     {
-        var serverProjectPath = Path.GetFullPath(
-            Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "ModelContextProtocol.McpServerWithStdio"));
-
-        System.Console.WriteLine($" Base Directory :{AppContext.BaseDirectory}");
+       
         
         
-        System.Console.WriteLine($"Connecting to MCP server at: {serverProjectPath}");
-
-        var transport = new StdioClientTransport(new StdioClientTransportOptions
+        var transport = new HttpClientTransport(new HttpClientTransportOptions
         {
-            Name = "Local Stdio MCP Server",
-            Command = "dotnet",
-            Arguments = ["run", "--project", serverProjectPath],
+            Endpoint = new Uri("http://localhost:5000/mcp"),
+            TransportMode = HttpTransportMode.StreamableHttp,
+            ConnectionTimeout = TimeSpan.FromSeconds(30)
         });
+
 
         await using var client = await McpClient.CreateAsync(transport);
         
