@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Linq;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
 using ModelContextProtocol.Client;
@@ -40,6 +41,9 @@ public static class LocalStdioMcpAgent
         foreach (var content in randomNumberToolResult.Content.OfType<TextContentBlock>())
             System.Console.WriteLine($" get_random_number tool result  => {content.Text}");
 
+        System.Console.WriteLine("#################################");
+        
+        
         var motivationalQuoteToolResult = await client.CallToolAsync(
             "get_motivational_quote",
             new Dictionary<string, object?>());
@@ -71,10 +75,44 @@ public static class LocalStdioMcpAgent
             "1 ile 50 arasında rastgele bir sayı üret.",
             session);
         System.Console.WriteLine($"Agent (random number): {randomNumberResponse}");
+        PrintToolUsage(randomNumberResponse);
 
         var motivationalQuoteResponse = await agent.RunAsync(
             "Bana motive edici bir söz söyler misin?",
             session);
         System.Console.WriteLine($"Agent (motivational quote): {motivationalQuoteResponse}");
+        PrintToolUsage(motivationalQuoteResponse);
+    }
+
+    /// <summary>
+    /// Verilen ajan cevabında bir tool (function) çağrısı yapılıp yapılmadığını kontrol eder
+    /// ve hangi tool'ların hangi argümanlarla çağrıldığını, sonuçlarıyla birlikte yazdırır.
+    /// </summary>
+    private static void PrintToolUsage(AgentResponse response)
+    {
+        var calls = response.Messages
+            .SelectMany(m => m.Contents)
+            .OfType<FunctionCallContent>()
+            .ToList();
+
+        var results = response.Messages
+            .SelectMany(m => m.Contents)
+            .OfType<FunctionResultContent>()
+            .ToList();
+
+        if (calls.Count == 0)
+        {
+            System.Console.WriteLine("  ⚠ Tool kullanılmadı — cevap doğrudan modelden geldi.");
+            return;
+        }
+
+        foreach (var call in calls)
+        {
+            var args = string.Join(", ", call.Arguments?.Select(a => $"{a.Key}={a.Value}") ?? []);
+            System.Console.WriteLine($"  ✔ Tool çağrıldı: {call.Name}({args})");
+        }
+
+        foreach (var result in results)
+            System.Console.WriteLine($"  ↳ Tool sonucu (callId={result.CallId}): {result.Result}");
     }
 }
