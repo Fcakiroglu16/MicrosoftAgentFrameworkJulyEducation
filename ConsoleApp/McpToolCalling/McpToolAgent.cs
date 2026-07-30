@@ -8,7 +8,7 @@ using OpenAI;
 namespace App.Console.McpToolCalling;
 
 
-public static class LocalStdioMcpAgent
+public static class McpToolAgent
 {
     public static async Task RunAsync(string apiKey)
     {
