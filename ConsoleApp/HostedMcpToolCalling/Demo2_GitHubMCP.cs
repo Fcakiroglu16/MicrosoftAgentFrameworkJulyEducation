@@ -43,9 +43,12 @@ public static class GitHubMcp
             .AsIChatClient()
             .AsAIAgent(
                 instructions:
-                    "You are a GitHub research assistant. " +
-                    "Use the available GitHub tools to search repositories, read files, and explore code. " +
-                    "Always look up information before answering — never guess repository details.",
+                    "You are a general-purpose assistant with access to a set of tools. " +
+                    "For every user question, first check the available tools to see if one of them " +
+                    "can help answer it, and if so, call that tool before responding. " +
+                    "If none of the available tools are suitable for the question, do not answer it — " +
+                    "instead tell the user that you have no suitable tool to answer that question. " +
+                    "Never guess or make up information; only answer using what the tools return.",
                 tools: tools.Cast<AITool>().ToList());
         
         AgentSession session = await agent.CreateSessionAsync();

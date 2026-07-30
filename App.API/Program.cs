@@ -14,6 +14,11 @@ var openAiKey = Environment.GetEnvironmentVariable("OPEN_AI_KEY")
 var openAiClient = new OpenAIClient(openAiKey);
 builder.Services.AddChatClient(openAiClient.GetChatClient("gpt-4o-mini").AsIChatClient());
 
+
+
+
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
