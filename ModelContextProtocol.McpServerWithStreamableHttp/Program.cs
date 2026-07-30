@@ -15,6 +15,6 @@ builder.Services.AddMcpServer().WithHttpTransport()
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
-app.MapMcp();
+app.MapMcp("/mcp");
 app.Run();
 
