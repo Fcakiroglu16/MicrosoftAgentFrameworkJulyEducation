@@ -31,28 +31,25 @@ public static class McpResourceAgent
 
 
        await Resources.ListStaticResourcesAsync(client);
-       await Resources.ListAndReadTemplateResourcesAsync(client);
-
      
-  
-        
-        
-        
-        
+       await Resources.ListAndReadTemplateResourcesAsync(client);
+       var profileText = await Resources.ReadTemplateResourceAsync(client, "users://profiles/1");
+     
        
         AIAgent agent = new OpenAIClient(apiKey)
             .GetChatClient("gpt-4o-mini")
             .AsIChatClient()
             .AsAIAgent(
                 instructions:
-                "You are a general-purpose assistant with access to a set of tools. " +
-                "For every user question, first check the available tools to see if one of them " +
-                "can help answer it, and if so, call that tool before responding. " +
-                "If none of the available tools are suitable for the question, do not answer it — " +
-                "instead tell the user that you have no suitable tool to answer that question. " +
-                "Never guess or make up information; only answer using what the tools return.");
+                "You are a general-purpose assistant with access to a set of tools. ");
         
         AgentSession session = await agent.CreateSessionAsync();
+
+        var profileQuestionResponse = await agent.RunAsync(
+            $"Here is a user profile JSON:\n\n{profileText}\n\n" +
+            "What is this user's name and what role do they have?",
+            session);
+        System.Console.WriteLine($"Agent (profile question): {profileQuestionResponse}");
 
     }
 

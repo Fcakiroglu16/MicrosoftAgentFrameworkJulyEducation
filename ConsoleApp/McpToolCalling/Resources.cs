@@ -1,5 +1,6 @@
 using ModelContextProtocol.Client;
 using ModelContextProtocol.Protocol;
+using System.Linq;
 
 namespace App.Console.McpToolCalling;
 
@@ -24,21 +25,22 @@ public class Resources
         foreach (var template in templates)
             System.Console.WriteLine($"  [{template.Name}] {template.UriTemplate}");
 
-        // Template'ler resources/list içinde gelmez; gerçek değerlerle URI oluşturup
-        // ReadResourceAsync ile tek tek okumak gerekir.
+        // Templates don't show up in resources/list; you need to build the actual URI
+        // with real values and read them one by one via ReadResourceAsync.
         await ReadTemplateResourceAsync(client, "users://profiles/1");
         await ReadTemplateResourceAsync(client, "users://roles/admin/members");
     }
 
-    private static async Task ReadTemplateResourceAsync(McpClient client, string uri)
+    public static async Task<string> ReadTemplateResourceAsync(McpClient client, string uri)
     {
         System.Console.WriteLine($"\n--- Reading template resource: {uri} ---");
 
         var result = await client.ReadResourceAsync(uri);
-        foreach (var content in result.Contents)
-        {
-            if (content is TextResourceContents text)
-                System.Console.WriteLine(text.Text);
-        }
+        var text = string.Join(
+            Environment.NewLine,
+            result.Contents.OfType<TextResourceContents>().Select(c => c.Text));
+
+        System.Console.WriteLine(text);
+        return text;
     }
 }
