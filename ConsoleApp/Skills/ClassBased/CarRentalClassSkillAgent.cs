@@ -15,9 +15,17 @@ public static class CarRentalClassSkillAgent
 
         var chatClient = new OpenAIClient(apiKey).GetChatClient("gpt-4o").AsIChatClient();
 
-        // Class-based skill örneği doğrudan oluşturulup skill provider'a verilir
+   
         var pricingSkill = new CarPricingClassSkill();
-        var skillsProvider = new AgentSkillsProvider(pricingSkill);
+        var skillsProvider = new AgentSkillsProvider(
+            [pricingSkill],
+            new AgentSkillsProviderOptions
+            {
+                DisableLoadSkillApproval = true,
+                DisableReadSkillResourceApproval = true,
+                DisableRunSkillScriptApproval = true
+            },
+            loggerFactory: null);
 
         var agent = chatClient.AsAIAgent(new ChatClientAgentOptions
         {

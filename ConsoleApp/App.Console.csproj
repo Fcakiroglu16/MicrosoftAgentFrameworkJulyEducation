@@ -15,4 +15,9 @@
         <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="10.7.0"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <!-- File-based skill'lerin (SKILL.md) çalışma zamanında bulunabilmesi için çıktı klasörüne kopyalanır -->
+        <None Include="Skills\FileBased\skills\**\*" CopyToOutputDirectory="PreserveNewest"/>
+    </ItemGroup>
+
 </Project>

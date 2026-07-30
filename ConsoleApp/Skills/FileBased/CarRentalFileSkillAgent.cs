@@ -2,9 +2,10 @@ using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
 using OpenAI;
 
-namespace App.Console.Skills.Inline;
+namespace App.Console.Skills.FileBased;
 
-public static class CarRentalInlineSkillAgent
+
+public static class CarRentalFileSkillAgent
 {
     public static AIAgent CreateAgent()
     {
@@ -14,30 +15,15 @@ public static class CarRentalInlineSkillAgent
 
         var chatClient = new OpenAIClient(apiKey).GetChatClient("gpt-4o").AsIChatClient();
 
-      
-        var pricingSkill = new AgentInlineSkill(
-                name: "car-pricing-skill",
-                description: "Araç kiralamaları için toplam ücreti hesaplar",
-                instructions: """
-                    İstenen araç kategorisi için fiyatlandırmayı belirlemek için bu skill'i kullan.
-                    1. Günlük ücreti öğrenmek için pricing-table kaynağını kontrol et.
-                    2. Günlük ücreti istenen gün sayısıyla çarp.
-                    """)
-            .AddResource(
-                "pricing-table",
-                """
-                | Kategori   | Günlük Ücret |
-                |------------|--------------|
-                | Ekonomik   | 30$          |
-                | Sedan      | 45$          |
-                | SUV        | 65$          |
-                """,
-                "Araç kategorilerine göre günlük kiralama ücretlerini içeren tablo");
-        
+    
+        var skillsPath = Path.Combine(AppContext.BaseDirectory, "Skills", "FileBased", "skills");
 
+   
         var skillsProvider = new AgentSkillsProvider(
-            [pricingSkill],
-            new AgentSkillsProviderOptions
+            skillPath: skillsPath,
+            scriptRunner: null,
+            fileOptions: null,
+            options: new AgentSkillsProviderOptions
             {
                 DisableLoadSkillApproval = true,
                 DisableReadSkillResourceApproval = true,
@@ -71,7 +57,7 @@ public static class CarRentalInlineSkillAgent
         var response = await agent.RunAsync(
             "3 gün boyunca bir SUV kiralamak istiyorum, toplam ücret ne kadar tutar?");
 
-        System.Console.WriteLine("--- Araç Kiralama Fiyat Teklifi ---");
+        System.Console.WriteLine("--- Araç Kiralama Fiyat Teklifi (File-based Skill) ---");
         System.Console.WriteLine(response.Text);
     }
 }

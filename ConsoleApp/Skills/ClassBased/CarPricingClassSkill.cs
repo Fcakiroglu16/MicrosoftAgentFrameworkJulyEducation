@@ -12,7 +12,7 @@ public sealed class CarPricingClassSkill : AgentClassSkill<CarPricingClassSkill>
     protected override string Instructions => """
         İstenen araç kategorisi için fiyatlandırmayı belirlemek için bu skill'i kullan.
         1. Günlük ücreti öğrenmek için pricing-table kaynağını kontrol et.
-        2. Toplam ücreti hesaplamak için calculate-total script'ini çağır.
+        2. Günlük ücreti istenen gün sayısıyla çarp.
         """;
     
     [AgentSkillResource("pricing-table")]
@@ -23,19 +23,4 @@ public sealed class CarPricingClassSkill : AgentClassSkill<CarPricingClassSkill>
         | Sedan      | 45$          |
         | SUV        | 65$          |
         """;
-
-   
-    [AgentSkillScript("calculate-total")]
-    private static double CalculateTotal(string category, int days)
-    {
-        var dailyRate = category.Trim().ToLowerInvariant() switch
-        {
-            "ekonomik" => 30d,
-            "sedan" => 45d,
-            "suv" => 65d,
-            _ => throw new ArgumentException($"Bilinmeyen kategori: {category}")
-        };
-
-        return dailyRate * days;
-    }
 }
