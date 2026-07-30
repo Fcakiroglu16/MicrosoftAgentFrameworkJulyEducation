@@ -18,7 +18,11 @@ public static class McpToolAgentWithStreamableHttp
         {
             Endpoint = new Uri("http://localhost:5000/mcp"),
             TransportMode = HttpTransportMode.StreamableHttp,
-            ConnectionTimeout = TimeSpan.FromSeconds(30)
+            ConnectionTimeout = TimeSpan.FromSeconds(30),
+            AdditionalHeaders = new Dictionary<string, string>
+            {
+                ["X-Api-Key"] = "dev-secret-key-change-me"
+            }
         });
 
 
@@ -77,6 +81,15 @@ public static class McpToolAgentWithStreamableHttp
             session);
         System.Console.WriteLine($"Agent (motivational quote): {motivationalQuoteResponse}");
         PrintToolUsage(motivationalQuoteResponse);
+        
+        
+        
+        
+        var productResponse = await agent.RunAsync(
+            "ismi kalem 1 olan fiyatı 300 tl olan ürünü ekle",
+            session);
+        System.Console.WriteLine($"Agent (Product ): {productResponse}");
+        PrintToolUsage(productResponse);
     }
 
     /// <summary>
