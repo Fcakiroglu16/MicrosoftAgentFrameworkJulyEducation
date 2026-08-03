@@ -1,11 +1,10 @@
 ﻿using App.Console.Agents;
-using App.Console.Skills.ClassBased;
-using App.Console.Skills.FileBased;
-using App.Console.Skills.Inline;
-
-Console.WriteLine("Microsoft Extensions AI Chat Client");
+using App.Console.Workflow;
 
 
-//await CarRentalInlineSkillAgent.Run();
-//await CarRentalClassSkillAgent.Run();
-await CarRentalFileSkillAgent.Run();
+Console.WriteLine("Workflow");
+
+await TextWorkflowSample.Run();
+//await TextWorkflowSample.RunStreaming();
+
+
