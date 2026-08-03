@@ -18,8 +18,8 @@ Console.WriteLine("Workflow");
 
 //await FanInSample.Run();
 
-await MutableWorkflowBuilderSample.Run();
+//await MutableWorkflowBuilderSample.Run();
 
-await ImmutableWorkflowSample.Run();
+//await ImmutableWorkflowSample.Run();
 
 
