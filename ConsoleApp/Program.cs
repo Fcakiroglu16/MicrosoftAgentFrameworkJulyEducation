@@ -2,6 +2,7 @@
 using App.Console.Workflow;
 using App.Console.Workflow.EdgeTypes;
 using App.Console.Workflow.Mutability;
+using App.Console.Workflow.State;
 
 
 Console.WriteLine("Workflow");
@@ -22,4 +23,5 @@ Console.WriteLine("Workflow");
 
 //await ImmutableWorkflowSample.Run();
 
+await StateSharingSample.Run();
 
