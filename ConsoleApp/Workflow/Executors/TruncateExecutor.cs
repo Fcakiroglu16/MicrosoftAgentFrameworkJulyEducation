@@ -1,6 +1,6 @@
 using Microsoft.Agents.AI.Workflows;
 
-namespace App.Console.Workflow;
+namespace App.Console.Workflow.Executors;
 
 
 public sealed class TruncateExecutor(int maxLength) : Executor<string, string>("TruncateExecutor")

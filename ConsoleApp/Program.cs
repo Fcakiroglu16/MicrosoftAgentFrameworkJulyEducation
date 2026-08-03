@@ -9,7 +9,9 @@ Console.WriteLine("Workflow");
 
 //await DirectEdgeSample.Run();
 
-await ConditionalEdgeSample.Run();
+//await ConditionalEdgeSample.Run();
+
+await SwitchCaseSample.Run();
 
 
 
