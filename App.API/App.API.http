@@ -1,31 +1,15 @@
-@App.API_HostAddress = http://localhost:5074
+@App_API_HostAddress = http://localhost:5074
+
+
 
 
 ###
-POST {{App.API_HostAddress}}/api/agent/non-streaming
+POST {{App_API_HostAddress}}/api/workflow/direct-edge
 Content-Type: application/json
 Accept: application/json
 
 {
-  "prompt": "Yeni bir mobil uygulama geliştirme projesini adımlara böl."
-}
-
-###
-POST {{App.API_HostAddress}}/api/agent/streaming
-Content-Type: application/json
-Accept: application/json
-
-{
-  "prompt": "Yeni bir mobil uygulama geliştirme projesini adımlara böl."
-}
-
-###
-POST {{App.API_HostAddress}}/api/workflow-agent/non-streaming
-Content-Type: application/json
-Accept: application/json
-
-{
-  "prompt": "hello from the exposed agent endpoint"
+  "prompt": "hello from the direct edge workflow endpoint"
 }
 
 ###

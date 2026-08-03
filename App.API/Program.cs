@@ -1,7 +1,7 @@
 using App.API.Workflow;
 using Microsoft.Agents.AI;
+using Microsoft.Agents.AI.Workflows;
 using Microsoft.Extensions.AI;
-using Microsoft.Extensions.DependencyInjection;
 using OpenAI;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,36 +35,39 @@ builder.Services.AddSingleton<AIAgent>(_ =>
 });
 
 
-builder.Services.AddKeyedSingleton<AIAgent>("text-workflow", (_, _) => TextWorkflowAgentFactory.CreateAgent());
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) app.MapOpenApi();
 
 
-var agentEndpoints = app.MapGroup("/api/agent");
 
+var workflowEndpoints = app.MapGroup("/api/workflow");
 
-
-
-var workflowAgentEndpoints = app.MapGroup("/api/workflow-agent");
-
-workflowAgentEndpoints.MapPost("/non-streaming", async (
+workflowEndpoints.MapPost("/direct-edge", async (
         AgentRequest request,
-        [FromKeyedServices("text-workflow")] AIAgent agent,
         CancellationToken cancellationToken) =>
     {
         if (string.IsNullOrWhiteSpace(request.Prompt))
             return Results.BadRequest(new { Message = "Prompt boş olamaz." });
 
-        var response = await agent.RunAsync(
-            request.Prompt,
-            cancellationToken: cancellationToken);
+        var upperCaseExecutor = new UpperCaseExecutor();
+        var truncateExecutor = new TruncateExecutor(maxLength: 15);
+        var exclamationExecutor = new ExclamationExecutor();
 
-        return Results.Ok(new AgentResponse(response.Text));
+        var workflow = new WorkflowBuilder(upperCaseExecutor)
+            .AddEdge(upperCaseExecutor, truncateExecutor)
+            .AddEdge(truncateExecutor, exclamationExecutor)
+            .WithOutputFrom(exclamationExecutor)
+            .Build();
+
+        var run = await InProcessExecution.RunAsync(workflow, request.Prompt, cancellationToken: cancellationToken);
+
+        var resultText = run.NewEvents.OfType<WorkflowOutputEvent>().FirstOrDefault()?.As<string>() ?? string.Empty;
+
+        return Results.Ok(new AgentResponse(resultText));
     })
-    .WithName("RunWorkflowAgentNonStreaming");
+    .WithName("RunDirectEdgeWorkflow");
 
 
 app.Run();
