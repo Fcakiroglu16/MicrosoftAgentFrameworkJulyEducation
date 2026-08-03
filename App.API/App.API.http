@@ -20,3 +20,12 @@ Accept: application/json
 }
 
 ###
+POST {{App.API_HostAddress}}/api/workflow-agent/non-streaming
+Content-Type: application/json
+Accept: application/json
+
+{
+  "prompt": "hello from the exposed agent endpoint"
+}
+
+###
