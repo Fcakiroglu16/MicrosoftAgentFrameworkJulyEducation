@@ -5,6 +5,7 @@ using App.Console.Workflow.AgentsInWorkflow;
 using App.Console.Workflow.EdgeTypes;
 using App.Console.Workflow.Mutability;
 using App.Console.Workflow.State;
+using App.Console.Workflow.WorkflowAsAgent;
 
 
 Console.WriteLine("Workflow");
@@ -27,8 +28,8 @@ Console.WriteLine("Workflow");
 
 //await StateSharingSample.Run();
 
-await AgentWorkflowSample.Run();
+//wait AgentWorkflowSample.Run();
 
+//await AgentsInWorkflowSample.Run();
 
-
-await AgentsInWorkflowSample.Run();
+await WorkflowAsAgentSample.Run();

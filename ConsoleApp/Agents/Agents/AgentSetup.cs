@@ -147,6 +147,60 @@ public static class AgentSetup
         });
     }
 
+    /// <summary>
+    /// Creates a research agent used as the first step of the content pipeline workflow.
+    /// </summary>
+    public static ChatClientAgent GetResearchAgent()
+    {
+        var chatClient = CreateChatClient();
+
+        return chatClient.AsAIAgent(new ChatClientAgentOptions
+        {
+            Name = "ResearchAgent",
+            Description = "Researches and gathers information on a given topic.",
+            ChatOptions = new ChatOptions
+            {
+                Instructions = "You are a researcher. Research and gather information on the given topic."
+            }
+        });
+    }
+
+    /// <summary>
+    /// Creates a writer agent used as the second step of the content pipeline workflow.
+    /// </summary>
+    public static ChatClientAgent GetWriterAgent()
+    {
+        var chatClient = CreateChatClient();
+
+        return chatClient.AsAIAgent(new ChatClientAgentOptions
+        {
+            Name = "WriterAgent",
+            Description = "Writes clear, engaging content based on research.",
+            ChatOptions = new ChatOptions
+            {
+                Instructions = "You are a writer. Write clear, engaging content based on research."
+            }
+        });
+    }
+
+    /// <summary>
+    /// Creates a reviewer agent used as the final step of the content pipeline workflow.
+    /// </summary>
+    public static ChatClientAgent GetReviewerAgent()
+    {
+        var chatClient = CreateChatClient();
+
+        return chatClient.AsAIAgent(new ChatClientAgentOptions
+        {
+            Name = "ReviewerAgent",
+            Description = "Reviews the content and provides a final polished version.",
+            ChatOptions = new ChatOptions
+            {
+                Instructions = "You are a reviewer. Review the content and provide a final polished version."
+            }
+        });
+    }
+
     public static string? Truncate(string? text, int maxLength = 80)
     {
         return text?.Length > maxLength ? string.Concat(text.AsSpan(0, maxLength), "...") : text;
