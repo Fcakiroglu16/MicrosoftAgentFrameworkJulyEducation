@@ -25,17 +25,19 @@ public static class AgentsInWorkflowSample
             .AddEdge(upperCaseAgent, sentimentAgent)
             .WithOutputFrom(sentimentAgent)
             .Build();
-
-        // Execute the workflow
+        
+        
+        
+        // Execute the workflow (streaming)
         await using StreamingRun run = await InProcessExecution.RunStreamingAsync(workflow, new ChatMessage(ChatRole.User, Input));
-
+        
         // Must send the turn token to trigger the agents.
         // The agents are wrapped as executors. When they receive messages,
         // they will cache the messages and only start processing when they receive a TurnToken.
         await run.TrySendMessageAsync(new TurnToken(emitEvents: true));
-        await foreach (WorkflowEvent evt in run.WatchStreamAsync())
+        await foreach (WorkflowEvent evt2 in run.WatchStreamAsync())
         {
-            if (evt is AgentResponseUpdateEvent executorComplete)
+            if (evt2 is AgentResponseUpdateEvent executorComplete)
             {
                 System.Console.WriteLine($"{executorComplete.ExecutorId}: {executorComplete.Data}");
             }
