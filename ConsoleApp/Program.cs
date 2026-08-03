@@ -11,7 +11,9 @@ Console.WriteLine("Workflow");
 
 //await ConditionalEdgeSample.Run();
 
-await SwitchCaseSample.Run();
+//await SwitchCaseSample.Run();
+
+await FanOutSample.Run();
 
 
 
