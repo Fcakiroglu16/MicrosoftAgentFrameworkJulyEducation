@@ -13,7 +13,9 @@ Console.WriteLine("Workflow");
 
 //await SwitchCaseSample.Run();
 
-await FanOutSample.Run();
+//await FanOutSample.Run();
+
+await FanInSample.Run();
 
 
 
