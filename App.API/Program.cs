@@ -1,5 +1,4 @@
 using A2A;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
 using OpenAI;
@@ -40,8 +39,6 @@ if (app.Environment.IsDevelopment()) app.MapOpenApi();
 
 app.MapDefaultEndpoints();
 
-// App2.API'deki agent'ı A2A protokolü ile keşfedip çağırır.
-// Doküman: https://learn.microsoft.com/en-us/agent-framework/agents/providers/agent-to-agent
 app.MapPost("/remote-agent/weather", async (
     AgentRequest request,
     [FromKeyedServices(RemoteAgent.AgentKey)] AIAgent agent,
