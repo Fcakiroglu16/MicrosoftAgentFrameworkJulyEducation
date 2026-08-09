@@ -9,7 +9,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\App.API\App.API.csproj"/>
+        <ProjectReference Include="..\App.API\App.API.csproj" />
+        <ProjectReference Include="..\App2.API\App2.API.csproj" />
     </ItemGroup>
 
 </Project>
