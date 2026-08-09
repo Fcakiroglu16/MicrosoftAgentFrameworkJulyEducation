@@ -1,10 +1,11 @@
 ﻿
-using App.Console.Orchestrations.Sequential;
+using App.Console.Orchestrations.Concurrent;
 
 
 Console.WriteLine("Orchestration Workflow");
 
-await SequentialOrderWorkflow.RunAsync();
+//await SequentialOrderWorkflow.RunAsync();
+await ConcurrentTranslationWorkflow.RunAsync();
 
 
 
