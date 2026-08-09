@@ -1,17 +1,10 @@
 @App_API_HostAddress = http://localhost:5074
 
-
-
-
-
-
 ###
-POST {{App_API_HostAddress}}/api/sequential-order-workflow
+POST {{App_API_HostAddress}}/remote-agent/weather
 Content-Type: application/json
 Accept: application/json
 
 {
-  "orderRequest": "5 adet Defter sipariş etmek istiyorum."
+  "prompt": "Ankara icin bugunku hava durumu nasil?"
 }
-
-###

@@ -2,7 +2,6 @@ using A2A;
 using A2A.AspNetCore;
 using Microsoft.Agents.AI;
 using Microsoft.Agents.AI.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.AI;
 using OpenAI;
 
@@ -57,16 +56,31 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Agent'ı A2A protokolü üzerinden dış dünyaya aç.
-// 1) HTTP+JSON (REST) transport: /a2a/weather/card, /message:send, /message:stream
-// MapA2AHttpJson sabit bir varsayilan agent card urettigi icin card'i kendimiz veriyoruz.
 var weatherA2AServer = app.Services.GetRequiredKeyedService<A2AServer>("weather");
+
+
+// Aspire, bu resource icin ASPNETCORE_URLS ortam degiskenini gercek
+// (wildcard olmayan) host:port ile ayarlar. app.Urls, sunucu baslamadan
+// once bos gelebildigi icin degiskeni dogrudan ortamdan okuyoruz.
+var weatherA2ABaseUrl = Environment.GetEnvironmentVariable("ASPNETCORE_URLS")!
+    .Split(';', StringSplitOptions.RemoveEmptyEntries)
+    .First(u => u.StartsWith("https://", StringComparison.OrdinalIgnoreCase));
 
 app.MapHttpA2A(weatherA2AServer, new AgentCard
 {
     Name = "Weather Agent",
     Description = "Sehirler icin kisa hava durumu yorumu yapan agent.",
-    Version = "1.0"
+    Version = "1.0",
+    // A2AClientFactory, agent card'i cozerken bu listede eslesen bir
+    // protokol (HTTP+JSON / JSONRPC) arar. Bos birakilirsa A2AException firlar.
+    SupportedInterfaces =
+    [
+        new AgentInterface
+        {
+            Url = $"{weatherA2ABaseUrl}/a2a/weather",
+            ProtocolBinding = "HTTP+JSON"
+        }
+    ]
 }, "/a2a/weather");
 
 // Aynı agent'ı normal (minimal API) HTTP endpoint'i olarak da dışa aç.
