@@ -1,6 +1,78 @@
 @App2.API_HostAddress = http://localhost:5155
+@ContextId = demo-context
 
-GET {{App2.API_HostAddress}}/weatherforecast/
+### Agent card (A2A discovery)
+GET {{App2.API_HostAddress}}/a2a/weather/card
 Accept: application/json
+
+### A2A HTTP+JSON - mesaj gonder (tek seferlik yanit)
+POST {{App2.API_HostAddress}}/a2a/weather/message:send
+Content-Type: application/json
+
+{
+  "message": {
+    "kind": "message",
+    "role": "ROLE_USER",
+    "parts": [
+      {
+        "kind": "text",
+        "text": "Ankara icin bugunku hava durumu nasil?"
+      }
+    ],
+    "messageId": "msg-1",
+    "contextId": "{{ContextId}}"
+  }
+}
+
+### A2A HTTP+JSON - ayni konusmaya devam et (contextId ayni)
+POST {{App2.API_HostAddress}}/a2a/weather/message:send
+Content-Type: application/json
+
+{
+  "message": {
+    "kind": "message",
+    "role": "ROLE_USER",
+    "parts": [
+      {
+        "kind": "text",
+        "text": "Peki yarin icin ne dersin?"
+      }
+    ],
+    "messageId": "msg-2",
+    "contextId": "{{ContextId}}"
+  }
+}
+
+### A2A HTTP+JSON - streaming yanit (SSE)
+POST {{App2.API_HostAddress}}/a2a/weather/message:stream
+Content-Type: application/json
+Accept: text/event-stream
+
+{
+  "message": {
+    "kind": "message",
+    "role": "ROLE_USER",
+    "parts": [
+      {
+        "kind": "text",
+        "text": "Izmir icin hafta sonu hava durumu nasil?"
+      }
+    ],
+    "messageId": "msg-3",
+    "contextId": "{{ContextId}}"
+  }
+}
+
+### A2A HTTP+JSON - task listesi
+GET {{App2.API_HostAddress}}/a2a/weather/tasks
+Accept: application/json
+
+### Klasik minimal API endpoint'i (A2A disi)
+POST {{App2.API_HostAddress}}/agents/weather
+Content-Type: application/json
+
+{
+  "prompt": "Antalya icin hava durumu nasil?"
+}
 
 ###
