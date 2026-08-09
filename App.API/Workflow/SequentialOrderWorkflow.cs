@@ -5,11 +5,13 @@ namespace App.API.Workflow;
 
 public static class SequentialOrderWorkflow
 {
-    public static async Task<List<ChatMessage>> ExecuteAsync(string orderRequest)
+    public static async Task<List<ChatMessage>> ExecuteAsync(IChatClient chatClient, string orderRequest)
     {
-        var orderAgent = OrchestrationAgents.GetOrderIntakeAgent();
-        var stockCheckAgent = OrchestrationAgents.GetStockCheckAgent();
-        var invoiceAgent = OrchestrationAgents.GetInvoiceAgent();
+        ArgumentNullException.ThrowIfNull(chatClient);
+
+        var orderAgent = OrchestrationAgents.GetOrderIntakeAgent(chatClient);
+        var stockCheckAgent = OrchestrationAgents.GetStockCheckAgent(chatClient);
+        var invoiceAgent = OrchestrationAgents.GetInvoiceAgent(chatClient);
 
         var workflow = AgentWorkflowBuilder.BuildSequential(new[] { orderAgent, stockCheckAgent, invoiceAgent });
 
@@ -20,17 +22,13 @@ public static class SequentialOrderWorkflow
 
         List<ChatMessage> result = new();
         var seenEventTypes = new List<string>();
-        var executorTextBuffers = new Dictionary<string, System.Text.StringBuilder>();
         await foreach (WorkflowEvent evt in run.WatchStreamAsync())
         {
             seenEventTypes.Add(evt.GetType().Name);
 
             if (evt is AgentResponseUpdateEvent updateEvt)
             {
-                var buffer = executorTextBuffers.TryGetValue(updateEvt.ExecutorId, out var existing)
-                    ? existing
-                    : executorTextBuffers[updateEvt.ExecutorId] = new System.Text.StringBuilder();
-                buffer.Append(updateEvt.Update.Text);
+                Console.Write(updateEvt.Update.Text);
             }
 
             if (evt is WorkflowOutputEvent outputEvt)
@@ -40,16 +38,13 @@ public static class SequentialOrderWorkflow
             }
         }
 
-        var executorSummary = string.Join(
-            " | ",
-            executorTextBuffers.Select(kvp => $"{kvp.Key}: {kvp.Value.Length} karakter"));
-
-        if (result.Count == 0)
+        Console.WriteLine();
+        foreach (var message in result)
         {
-            throw new InvalidOperationException(
-                $"Workflow bir sonuç üretmeden tamamlandı. Alınan event'ler: {string.Join(", ", seenEventTypes)}. " +
-                $"Executor çıktıları: {(executorSummary.Length == 0 ? "hiçbiri içerik üretmedi" : executorSummary)}");
+            Console.WriteLine($"[{message.Role}] {message.Text}");
         }
+
+
 
         return result;
     }

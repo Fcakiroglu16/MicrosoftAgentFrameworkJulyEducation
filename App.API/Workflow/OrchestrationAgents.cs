@@ -1,22 +1,10 @@
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
-using OpenAI;
 
 namespace App.API.Workflow;
 
 public static class OrchestrationAgents
 {
-    private static IChatClient CreateChatClient()
-    {
-        var apiKey = Environment.GetEnvironmentVariable("OPEN_AI_KEY");
-        if (string.IsNullOrWhiteSpace(apiKey))
-            throw new InvalidOperationException("Please set the OPEN_AI_KEY environment variable.");
-
-        return new OpenAIClient(apiKey)
-            .GetChatClient("gpt-4o")
-            .AsIChatClient();
-    }
-
     private static readonly Dictionary<string, int> StockTable = new(StringComparer.OrdinalIgnoreCase)
     {
         ["Kalem"] = 50,
@@ -35,9 +23,9 @@ public static class OrchestrationAgents
             : $"Stok yetersiz: '{productName}' için istenen {quantity} adet karşılanamıyor (stokta yalnızca {available} adet var).";
     }
 
-    public static ChatClientAgent GetOrderIntakeAgent()
+    public static ChatClientAgent GetOrderIntakeAgent(IChatClient chatClient)
     {
-        var chatClient = CreateChatClient();
+        ArgumentNullException.ThrowIfNull(chatClient);
 
         return chatClient.AsAIAgent(new ChatClientAgentOptions
         {
@@ -55,9 +43,9 @@ public static class OrchestrationAgents
         });
     }
 
-    public static ChatClientAgent GetStockCheckAgent()
+    public static ChatClientAgent GetStockCheckAgent(IChatClient chatClient)
     {
-        var chatClient = CreateChatClient();
+        ArgumentNullException.ThrowIfNull(chatClient);
 
         return chatClient.AsAIAgent(new ChatClientAgentOptions
         {
@@ -76,9 +64,9 @@ public static class OrchestrationAgents
         });
     }
 
-    public static ChatClientAgent GetInvoiceAgent()
+    public static ChatClientAgent GetInvoiceAgent(IChatClient chatClient)
     {
-        var chatClient = CreateChatClient();
+        ArgumentNullException.ThrowIfNull(chatClient);
 
         return chatClient.AsAIAgent(new ChatClientAgentOptions
         {
