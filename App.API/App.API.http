@@ -3,13 +3,15 @@
 
 
 
+
+
 ###
-POST {{App_API_HostAddress}}/api/workflow/direct-edge
+POST {{App_API_HostAddress}}/api/sequential-order-workflow
 Content-Type: application/json
 Accept: application/json
 
 {
-  "prompt": "hello from the direct edge workflow endpoint"
+  "orderRequest": "5 adet Defter sipariş etmek istiyorum."
 }
 
 ###

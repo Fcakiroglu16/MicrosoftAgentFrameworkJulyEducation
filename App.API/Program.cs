@@ -1,8 +1,5 @@
-using App.API.Workflow;
-using Microsoft.Agents.AI;
-using Microsoft.Agents.AI.Workflows;
+using App.Console.Orchestrations.Sequential;
 using Microsoft.Extensions.AI;
-using OpenAI;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,24 +12,6 @@ var apiKey = Environment.GetEnvironmentVariable("OPEN_AI_KEY");
 if (string.IsNullOrWhiteSpace(apiKey))
     throw new InvalidOperationException("Lütfen OPEN_AI_KEY ortam değişkenini ayarlayın.");
 
-builder.Services.AddSingleton<AIAgent>(_ =>
-{
-    var chatClient = new OpenAIClient(apiKey).GetChatClient("gpt-4o").AsIChatClient();
-
-    var agent = chatClient.AsAIAgent(new ChatClientAgentOptions
-    {
-        Name = "Simple Agent",
-        Description =
-            "Simple Agent",
-        ChatOptions = new ChatOptions
-        {
-            Instructions = """
-                           Simple Agent
-                           """
-        }
-    });
-    return agent;
-});
 
 
 var app = builder.Build();
@@ -40,34 +19,18 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) app.MapOpenApi();
 
+app.MapPost("/api/sequential-order-workflow", async (SequentialOrderWorkflowRequest request) =>
+{
+    if (string.IsNullOrWhiteSpace(request.OrderRequest))
+        return Results.BadRequest("OrderRequest boş olamaz.");
 
+    List<ChatMessage> result = await SequentialOrderWorkflow.ExecuteAsync(request.OrderRequest);
 
-var workflowEndpoints = app.MapGroup("/api/workflow");
-
-workflowEndpoints.MapPost("/direct-edge", async (
-        AgentRequest request,
-        CancellationToken cancellationToken) =>
-    {
-        if (string.IsNullOrWhiteSpace(request.Prompt))
-            return Results.BadRequest(new { Message = "Prompt boş olamaz." });
-
-        var upperCaseExecutor = new UpperCaseExecutor();
-        var truncateExecutor = new TruncateExecutor(maxLength: 15);
-        var exclamationExecutor = new ExclamationExecutor();
-
-        var workflow = new WorkflowBuilder(upperCaseExecutor)
-            .AddEdge(upperCaseExecutor, truncateExecutor)
-            .AddEdge(truncateExecutor, exclamationExecutor)
-            .WithOutputFrom(exclamationExecutor)
-            .Build();
-
-        var run = await InProcessExecution.RunAsync(workflow, request.Prompt, cancellationToken: cancellationToken);
-
-        var resultText = run.NewEvents.OfType<WorkflowOutputEvent>().FirstOrDefault()?.As<string>() ?? string.Empty;
-
-        return Results.Ok(new AgentResponse(resultText));
-    })
-    .WithName("RunDirectEdgeWorkflow");
+    var response = result.Select(m => new AgentResponse(m.Text ?? string.Empty)).ToList();
+    return Results.Ok(response);
+})
+.WithName("SequentialOrderWorkflow")
+.WithSummary("Sipariş -> Stok Kontrolü -> Fatura sequential agent workflow'unu çalıştırır.");
 
 
 app.Run();
@@ -75,3 +38,5 @@ app.Run();
 internal sealed record AgentRequest(string Prompt);
 
 internal sealed record AgentResponse(string Text);
+
+internal sealed record SequentialOrderWorkflowRequest(string OrderRequest);

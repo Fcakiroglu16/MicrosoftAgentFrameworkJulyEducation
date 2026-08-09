@@ -16,6 +16,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\MicrosoftAgentFrameworkJulyEducation.ServiceDefaults\MicrosoftAgentFrameworkJulyEducation.ServiceDefaults.csproj"/>
+        <ProjectReference Include="..\ConsoleApp\App.Console.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
