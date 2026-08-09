@@ -1,8 +1,8 @@
-﻿using App.Console.Agents;
+﻿
 using App.Console.Orchestrations.Sequential;
 
 
-Console.WriteLine("Workflow");
+Console.WriteLine("Orchestration Workflow");
 
 await SequentialOrderWorkflow.RunAsync();
 
