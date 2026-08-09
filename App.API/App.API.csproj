@@ -8,15 +8,14 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Agents.AI" Version="1.13.0"/>
-        <PackageReference Include="Microsoft.Agents.AI.OpenAI" Version="1.13.0"/>
         <PackageReference Include="Microsoft.Agents.AI.Workflows" Version="1.13.0"/>
+        <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="10.7.0"/>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.10"/>
         <PackageReference Include="Microsoft.OpenApi" Version="2.7.5"/>
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\MicrosoftAgentFrameworkJulyEducation.ServiceDefaults\MicrosoftAgentFrameworkJulyEducation.ServiceDefaults.csproj"/>
-        <ProjectReference Include="..\ConsoleApp\App.Console.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
