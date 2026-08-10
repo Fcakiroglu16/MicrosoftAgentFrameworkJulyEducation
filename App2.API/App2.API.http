@@ -23,26 +23,6 @@ Content-Type: application/json
     "contextId": "{{ContextId}}"
   }
 }
-
-### A2A HTTP+JSON - ayni konusmaya devam et (contextId ayni)
-POST {{App2.API_HostAddress}}/a2a/weather/message:send
-Content-Type: application/json
-
-{
-  "message": {
-    "kind": "message",
-    "role": "ROLE_USER",
-    "parts": [
-      {
-        "kind": "text",
-        "text": "Peki yarin icin ne dersin?"
-      }
-    ],
-    "messageId": "msg-2",
-    "contextId": "{{ContextId}}"
-  }
-}
-
 ### A2A HTTP+JSON - streaming yanit (SSE)
 POST {{App2.API_HostAddress}}/a2a/weather/message:stream
 Content-Type: application/json
@@ -62,11 +42,6 @@ Accept: text/event-stream
     "contextId": "{{ContextId}}"
   }
 }
-
-### A2A HTTP+JSON - task listesi
-GET {{App2.API_HostAddress}}/a2a/weather/tasks
-Accept: application/json
-
 ### Klasik minimal API endpoint'i (A2A disi)
 POST {{App2.API_HostAddress}}/agents/weather
 Content-Type: application/json

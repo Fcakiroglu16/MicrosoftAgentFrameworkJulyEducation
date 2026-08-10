@@ -19,12 +19,6 @@ var apiKey = Environment.GetEnvironmentVariable("OPEN_AI_KEY");
 if (string.IsNullOrWhiteSpace(apiKey))
     throw new InvalidOperationException("Lütfen OPEN_AI_KEY ortam değişkenini ayarlayın.");
 
-// Keyed chat client kayıtları: agent hangi modeli kullanacağını bu key ile seçer.
-builder.Services.AddKeyedSingleton<IChatClient>(ChatClients.Gpt4o, (_, _) =>
-    new OpenAIClient(apiKey)
-        .GetChatClient("gpt-4o")
-        .AsIChatClient());
-
 builder.Services.AddKeyedSingleton<IChatClient>(ChatClients.Gpt4oMini, (_, _) =>
     new OpenAIClient(apiKey)
         .GetChatClient("gpt-4o-mini")
@@ -59,9 +53,6 @@ app.MapControllers();
 var weatherA2AServer = app.Services.GetRequiredKeyedService<A2AServer>("weather");
 
 
-// Aspire, bu resource icin ASPNETCORE_URLS ortam degiskenini gercek
-// (wildcard olmayan) host:port ile ayarlar. app.Urls, sunucu baslamadan
-// once bos gelebildigi icin degiskeni dogrudan ortamdan okuyoruz.
 var weatherA2ABaseUrl = Environment.GetEnvironmentVariable("ASPNETCORE_URLS")!
     .Split(';', StringSplitOptions.RemoveEmptyEntries)
     .First(u => u.StartsWith("https://", StringComparison.OrdinalIgnoreCase));
@@ -83,7 +74,6 @@ app.MapHttpA2A(weatherA2AServer, new AgentCard
     ]
 }, "/a2a/weather");
 
-// Aynı agent'ı normal (minimal API) HTTP endpoint'i olarak da dışa aç.
 app.MapPost("/agents/weather", async (
     WeatherAgentRequest request,
     [FromKeyedServices("weather")] AIAgent agent,

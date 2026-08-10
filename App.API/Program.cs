@@ -44,7 +44,7 @@ app.MapPost("/remote-agent/weather", async (
     [FromKeyedServices(RemoteAgent.AgentKey)] AIAgent agent,
     CancellationToken cancellationToken) =>
 {
-    var result = await agent.RunAsync(request.Prompt, cancellationToken: cancellationToken).ConfigureAwait(false);
+    var result = await agent.RunAsync(request.Prompt, cancellationToken: cancellationToken);
 
     return Results.Ok(new AgentResponse(result.Text));
 });
