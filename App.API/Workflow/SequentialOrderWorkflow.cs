@@ -28,7 +28,7 @@ public static class SequentialOrderWorkflow
 
             if (evt is AgentResponseUpdateEvent updateEvt)
             {
-                Console.Write(updateEvt.Update.Text);
+                System.Console.Write(updateEvt.Update.Text);
             }
 
             if (evt is WorkflowOutputEvent outputEvt)
@@ -38,10 +38,11 @@ public static class SequentialOrderWorkflow
             }
         }
 
-        Console.WriteLine();
+
+        System.Console.WriteLine();
         foreach (var message in result)
         {
-            Console.WriteLine($"[{message.Role}] {message.Text}");
+            System.Console.WriteLine($"[{message.Role}] {message.Text}");
         }
 
 

@@ -1,5 +1,7 @@
 using App.API.Workflow;
+
 using Microsoft.Extensions.AI;
+
 using OpenAI;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,18 +27,32 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) app.MapOpenApi();
 
-app.MapPost("/api/sequential-order-workflow", async (SequentialOrderWorkflowRequest request, IChatClient chatClient) =>
+//app.MapPost("/api/sequential-order-workflow", async (SequentialOrderWorkflowRequest request, IChatClient chatClient) =>
+//{
+//    if (string.IsNullOrWhiteSpace(request.OrderRequest))
+//        return Results.BadRequest("OrderRequest boş olamaz.");
+
+//    List<ChatMessage> result = await SequentialOrderWorkflow.ExecuteAsync(chatClient, request.OrderRequest);
+
+//    var response = result.Select(m => new AgentResponse(m.Text ?? string.Empty)).ToList();
+//    return Results.Ok(response);
+//})
+//.WithName("SequentialOrderWorkflow")
+//.WithSummary("Sipariş -> Stok Kontrolü -> Fatura sequential agent workflow'unu çalıştırır.");
+
+
+//App.API.Workflow.Sequential.SequentialOrderWorkflow.RunAsync().Wait();
+
+using (var scope = app.Services.CreateScope())
 {
-    if (string.IsNullOrWhiteSpace(request.OrderRequest))
-        return Results.BadRequest("OrderRequest boş olamaz.");
 
-    List<ChatMessage> result = await SequentialOrderWorkflow.ExecuteAsync(chatClient, request.OrderRequest);
+    var chatClient = scope.ServiceProvider.GetRequiredService<IChatClient>();
+    SequentialOrderWorkflow.ExecuteAsync(chatClient, "5 adet kalem almak istiyorum").Wait();
+}
 
-    var response = result.Select(m => new AgentResponse(m.Text ?? string.Empty)).ToList();
-    return Results.Ok(response);
-})
-.WithName("SequentialOrderWorkflow")
-.WithSummary("Sipariş -> Stok Kontrolü -> Fatura sequential agent workflow'unu çalıştırır.");
+
+
+
 
 
 app.Run();
