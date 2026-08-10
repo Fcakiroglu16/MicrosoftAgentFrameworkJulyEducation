@@ -8,3 +8,12 @@ Accept: application/json
 {
   "prompt": "Ankara icin bugunku hava durumu nasil?"
 }
+
+###
+POST {{App_API_HostAddress}}/orchestration/weather-french
+Content-Type: application/json
+Accept: application/json
+
+{
+  "prompt": "Ankara icin bugunku hava durumu nasil?"
+}
