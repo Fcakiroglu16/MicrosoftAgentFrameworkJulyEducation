@@ -4,16 +4,21 @@ using Microsoft.Extensions.AI;
 namespace App.API.Workflow.Sequential;
 
 
-public static class SequentialOrderWorkflow
+public class SequentialOrderWorkflow(IChatClient chatClient)
 {
 
 
-    public static async Task<List<ChatMessage>> ExecuteAsync(
+    public async Task<List<ChatMessage>> ExecuteAsync(
         string orderRequest)
     {
-        var orderAgent = OrchestrationAgents.GetOrderIntakeAgent();
-        var stockCheckAgent = OrchestrationAgents.GetStockCheckAgent();
-        var invoiceAgent = OrchestrationAgents.GetInvoiceAgent();
+
+
+
+
+        var orchestrationAgents = new OrchestrationAgents(chatClient);
+        var orderAgent = orchestrationAgents.GetOrderIntakeAgent();
+        var stockCheckAgent = orchestrationAgents.GetStockCheckAgent();
+        var invoiceAgent = orchestrationAgents.GetInvoiceAgent();
 
         var workflow = AgentWorkflowBuilder.BuildSequential(new[] { orderAgent, stockCheckAgent, invoiceAgent });
 

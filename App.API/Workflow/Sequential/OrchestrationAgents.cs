@@ -1,23 +1,13 @@
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
-using OpenAI;
 
 namespace App.API.Workflow.Sequential;
 
 
 
-public static class OrchestrationAgents
+public class OrchestrationAgents(IChatClient chatClient)
 {
-    private static IChatClient CreateChatClient()
-    {
-        var apiKey = Environment.GetEnvironmentVariable("OPEN_AI_KEY");
-        if (string.IsNullOrWhiteSpace(apiKey))
-            throw new InvalidOperationException("Please set the OPEN_AI_KEY environment variable.");
 
-        return new OpenAIClient(apiKey)
-            .GetChatClient("gpt-4o")
-            .AsIChatClient();
-    }
 
 
     private static readonly Dictionary<string, int> StockTable = new(StringComparer.OrdinalIgnoreCase)
@@ -40,9 +30,9 @@ public static class OrchestrationAgents
     }
 
 
-    public static ChatClientAgent GetOrderIntakeAgent()
+    public ChatClientAgent GetOrderIntakeAgent()
     {
-        var chatClient = CreateChatClient();
+
 
         return chatClient.AsAIAgent(new ChatClientAgentOptions
         {
@@ -61,9 +51,9 @@ public static class OrchestrationAgents
     }
 
 
-    public static ChatClientAgent GetStockCheckAgent()
+    public ChatClientAgent GetStockCheckAgent()
     {
-        var chatClient = CreateChatClient();
+
 
         return chatClient.AsAIAgent(new ChatClientAgentOptions
         {
@@ -83,9 +73,9 @@ public static class OrchestrationAgents
     }
 
 
-    public static ChatClientAgent GetInvoiceAgent()
+    public ChatClientAgent GetInvoiceAgent()
     {
-        var chatClient = CreateChatClient();
+
 
         return chatClient.AsAIAgent(new ChatClientAgentOptions
         {

@@ -21,18 +21,18 @@ builder.Services.AddSingleton<IChatClient>(_ =>
         .AsIChatClient());
 
 
-
+builder.Services.AddSingleton<SequentialOrderWorkflow>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) app.MapOpenApi();
 
-app.MapPost("/api/sequential-order-workflow", async (SequentialOrderWorkflowRequest request, IChatClient chatClient) =>
+app.MapPost("/api/sequential-order-workflow", async (SequentialOrderWorkflowRequest request, SequentialOrderWorkflow sequentialOrderWorkflow) =>
 {
     if (string.IsNullOrWhiteSpace(request.OrderRequest))
         return Results.BadRequest("OrderRequest boş olamaz.");
 
-    List<ChatMessage> result = await SequentialOrderWorkflow.ExecuteAsync(request.OrderRequest);
+    List<ChatMessage> result = await sequentialOrderWorkflow.ExecuteAsync(request.OrderRequest);
 
 
     return Results.Ok(result.Select(x => x.Text));
