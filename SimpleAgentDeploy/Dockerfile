@@ -1,4 +1,4 @@
-﻿FROM mcr.microsoft.com/dotnet/runtime:10.0 AS base
+﻿FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 USER $APP_UID
 WORKDIR /app
 
@@ -13,7 +13,8 @@ RUN dotnet build "./SimpleAgentDeploy.csproj" -c $BUILD_CONFIGURATION -o /app/bu
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./SimpleAgentDeploy.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./SimpleAgentDeploy.csproj" -c $BUILD_CONFIGURATION -o /app/publish \
+    /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
