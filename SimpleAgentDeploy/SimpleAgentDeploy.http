@@ -1,0 +1,155 @@
+@DeployFoundryCustomerAgent_HostAddress = http://localhost:8088
+
+### 1. Yeni sohbet başlat (conversationId göndermiyoruz)
+### StockCheckAgent, doğal dilde sorulan bir stok sorusunu anlar (ürün + adet)
+### ve CheckStock tool'unu çağırarak stok tablosundan (Kalem, Defter, Silgi, Kitap) kontrol yapar.
+POST {{DeployFoundryCustomerAgent_HostAddress}}/responses
+Content-Type: application/json
+
+{
+  "input": "5 adet Kalem stokta var mı?"
+}
+
+###
+
+### 2. Aynı oturumu devam ettir
+### Yanıttaki "id" değerini conversationId olarak gönder
+POST {{DeployFoundryCustomerAgent_HostAddress}}/responses
+Content-Type: application/json
+
+{
+  "input": "biraz önce hangi ürünü sordum?",
+  "conversationId": "caresp_7b8a2aea0f641c2900bbWti22PyHpuaVti1r0BRRdIx91Ee843"
+}
+
+###
+
+### 3. Sağlık kontrolü
+GET {{DeployFoundryCustomerAgent_HostAddress}}/readiness
+
+###
+
+
+# =============================================================================
+# FOUNDRY REST API — HOSTED AGENT DEPLOY
+# Kaynak: https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/deploy-hosted-agent
+#
+# Kullanım:
+#   1. Aşağıdaki değişkenleri kendi ortamınıza göre doldurun.
+#   2. TOKEN almak için terminalde şunu çalıştırın:
+#      az account get-access-token --resource https://ai.azure.com --query accessToken -o tsv
+# =============================================================================
+@Foundry_Account    = education-test-resource
+@Foundry_Project    = education
+@Foundry_BaseUrl    = https://{{Foundry_Account}}.services.ai.azure.com/api/projects/{{Foundry_Project}}
+@Foundry_ApiVersion = v1
+@Foundry_Token      = <az account get-access-token --resource https://ai.azure.com --query accessToken -o tsv>
+@Foundry_AgentName  = SimpleCustomerAgent
+
+
+### 4. [DEPLOY] Agent oluştur (ilk deploy — version 1 oluşturulur)
+POST {{Foundry_BaseUrl}}/agents/{{Foundry_AgentName}}/versions?api-version={{Foundry_ApiVersion}}
+Authorization: Bearer {{Foundry_Token}}
+Content-Type: application/json
+Foundry-Features: HostedAgents=V1Preview
+
+{
+  "definition": {
+    "kind": "hosted",
+    "container_configuration": {
+      "image": "educationfoundry.azurecr.io/simplecustomeragent:v5"
+    },
+    "cpu": "1",
+    "memory": "2Gi",
+    "protocol_versions": [
+      {
+        "protocol": "responses",
+        "version": "1.0.0"
+      }
+    ],
+    "environment_variables": {
+      "ASPNETCORE_ENVIRONMENT": "Production",
+      "ASPNETCORE_HTTP_PORTS": "8088",
+      "MODEL_DEPLOYMENT_NAME": "gpt-5-mini"
+    }
+  }
+}
+
+###
+
+### 5. [DEPLOY] Version durumunu sorgula — "active" olana kadar tekrarlayın
+### status: provisioning | active | failed | deleted
+GET {{Foundry_BaseUrl}}/agents/{{Foundry_AgentName}}/versions/1?api-version={{Foundry_ApiVersion}}
+Authorization: Bearer {{Foundry_Token}}
+Foundry-Features: HostedAgents=V1Preview
+
+###
+
+### 6. [INVOKE] Agent'ı çağır — Responses protokolü (OpenAI uyumlu)
+POST {{Foundry_BaseUrl}}/agents/{{Foundry_AgentName}}/endpoint/protocols/openai/responses?api-version={{Foundry_ApiVersion}}
+Authorization: Bearer {{Foundry_Token}}
+Content-Type: application/json
+Foundry-Features: HostedAgents=V1Preview
+
+{
+  "input": "3 adet Defter kaldı mı stokta?",
+  "store": false
+}
+
+###
+
+### 7. [INVOKE] Agent'ı çağır — Invocations protokolü (duplex / streaming)
+POST {{Foundry_BaseUrl}}/agents/{{Foundry_AgentName}}/endpoint/protocols/invocations?api-version={{Foundry_ApiVersion}}
+Authorization: Bearer {{Foundry_Token}}
+Content-Type: application/json
+Foundry-Features: HostedAgents=V1Preview
+
+{
+  "message": "2 adet Silgi stokta var mı?"
+}
+
+###
+
+### 8. [UPDATE] Yeni version deploy et (kod/config değişikliği sonrası)
+POST {{Foundry_BaseUrl}}/agents/{{Foundry_AgentName}}/versions?api-version={{Foundry_ApiVersion}}
+Authorization: Bearer {{Foundry_Token}}
+Content-Type: application/json
+Foundry-Features: HostedAgents=V1Preview
+
+{
+  "definition": {
+    "kind": "hosted",
+    "container_configuration": {
+      "image": "educationfoundry.azurecr.io/deployfoundrycustomeragent:v3"
+    },
+    "cpu": "1",
+    "memory": "2Gi",
+    "protocol_versions": [
+      {
+        "protocol": "responses",
+        "version": "1.0.0"
+      }
+    ],
+    "environment_variables": {
+      "ASPNETCORE_ENVIRONMENT": "Production",
+      "ASPNETCORE_HTTP_PORTS": "8088",
+      "MODEL_DEPLOYMENT_NAME": "gpt-5-mini"
+    }
+  }
+}
+
+###
+
+### 9. [CLEANUP] Belirli bir version'ı sil
+DELETE {{Foundry_BaseUrl}}/agents/{{Foundry_AgentName}}/versions/1?api-version={{Foundry_ApiVersion}}
+Authorization: Bearer {{Foundry_Token}}
+Foundry-Features: HostedAgents=V1Preview
+
+###
+
+### 10. [CLEANUP] Agent'ı tüm version'larıyla birlikte sil
+DELETE {{Foundry_BaseUrl}}/agents/{{Foundry_AgentName}}?api-version={{Foundry_ApiVersion}}
+Authorization: Bearer {{Foundry_Token}}
+Foundry-Features: HostedAgents=V1Preview
+
+###

@@ -196,7 +196,7 @@ public static class MagenticBusinessPlanWorkflow
             // Workflow'un ne yaptığını anlatan açıklama (dokümantasyon/izleme amaçlı).
             .WithDescription("Bir kahve dükkanı için araştırma ve başabaş analizini koordine eder.")
             // false: plan onaya sunulmaz, manager planı yapıp doğrudan uygular.
-            // true olsaydı plan önce insana gösterilip onay beklenirdi (human-in-the-loop).
+            // true olsaydı plan önce insana gösterilip onay beklenirdi (£n-in-the-loop).
             .RequirePlanSignoff(false)
             // Manager'ın koordinasyon döngüsünde en fazla 10 tur çalışmasına izin ver.
             // Sonsuz döngüye girip maliyet çıkarmasını engelleyen güvenlik sınırı.

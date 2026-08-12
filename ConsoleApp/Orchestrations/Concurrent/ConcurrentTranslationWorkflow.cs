@@ -54,13 +54,13 @@ public static class ConcurrentTranslationWorkflow
         {
             if (evt is AgentResponseUpdateEvent e)
             {
-                if (e.ExecutorId != lastExecutorId)
-                {
-                    lastExecutorId = e.ExecutorId;
-                    onExecutorChanged?.Invoke(e.ExecutorId, e.Update.Text ?? string.Empty);
-                }
-
-                onTextChunk?.Invoke(e.Update.Text ?? string.Empty);
+                // if (e.ExecutorId != lastExecutorId)
+                // {
+                //     lastExecutorId = e.ExecutorId;
+                //     onExecutorChanged?.Invoke(e.ExecutorId, e.Update.Text ?? string.Empty);
+                // }
+                //
+                // onTextChunk?.Invoke(e.Update.Text ?? string.Empty);
             }
             else if (evt is WorkflowOutputEvent outputEvt)
             {
@@ -84,7 +84,7 @@ public static class ConcurrentTranslationWorkflow
     }
 
     private static ChatClientAgent GetTranslationAgent(string targetLanguage, IChatClient chatClient) =>
-        new(chatClient,
+        new  ChatClientAgent(chatClient,
             $"You are a translation assistant who only responds in {targetLanguage}. Respond to any " +
             $"input by outputting the name of the input language and then translating the input to {targetLanguage}.",
             name: $"{targetLanguage}_Agent");

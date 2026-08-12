@@ -44,7 +44,7 @@ public static class HandoffSupportWorkflow
             var newMessages = await RunTurnAsync(workflow, messages);
 
             // Bu turda üretilen yeni mesajları geçmişe ekle.
-            messages.AddRange(newMessages.Skip(messages.Count));
+           messages.AddRange(newMessages.Skip(messages.Count));
         }
 
         System.Console.WriteLine();
@@ -119,7 +119,7 @@ public static class HandoffSupportWorkflow
                     System.Console.WriteLine();
                     System.Console.Write($"{e.ExecutorId}: ");
                 }
-
+                
                 System.Console.Write(e.Update.Text);
             }
             else if (evt is WorkflowOutputEvent outputEvt)

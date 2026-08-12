@@ -13,14 +13,7 @@ public static class SequentialOrderWorkflow
         System.Console.WriteLine();
         System.Console.WriteLine("=== Sequential Orchestration: Sipariş -> Stok Kontrolü -> Fatura ===");
 
-        List<ChatMessage> result = await ExecuteAsync(
-            "5 adet Defter sipariş etmek istiyorum.",
-            (executorId, text) =>
-            {
-                System.Console.WriteLine();
-                System.Console.Write($"{executorId}: ");
-            },
-            text => System.Console.Write(text));
+        List<ChatMessage> result = await ExecuteAsync("5 adet Defter sipariş etmek istiyorum.");
 
         System.Console.WriteLine();
         System.Console.WriteLine();
@@ -29,13 +22,9 @@ public static class SequentialOrderWorkflow
             System.Console.WriteLine($"{message.Role}: {message.Text}");
     }
 
-    public static Task<List<ChatMessage>> ExecuteAsync(string orderRequest)
-        => ExecuteAsync(orderRequest, onExecutorChanged: null, onTextChunk: null);
 
     private static async Task<List<ChatMessage>> ExecuteAsync(
-        string orderRequest,
-        Action<string, string>? onExecutorChanged,
-        Action<string>? onTextChunk)
+        string orderRequest)
     {
         var orderAgent = OrchestrationAgents.GetOrderIntakeAgent();
         var stockCheckAgent = OrchestrationAgents.GetStockCheckAgent();
@@ -54,13 +43,7 @@ public static class SequentialOrderWorkflow
         {
             if (evt is AgentResponseUpdateEvent e)
             {
-                if (e.ExecutorId != lastExecutorId)
-                {
-                    lastExecutorId = e.ExecutorId;
-                    onExecutorChanged?.Invoke(e.ExecutorId, e.Update.Text ?? string.Empty);
-                }
-
-                onTextChunk?.Invoke(e.Update.Text ?? string.Empty);
+               
             }
             else if (evt is WorkflowOutputEvent outputEvt)
             {
