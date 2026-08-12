@@ -7,7 +7,7 @@ POST {{DeployFoundryCustomerAgent_HostAddress}}/responses
 Content-Type: application/json
 
 {
-  "input": "5 adet Kalem stokta var mı?"
+  "input": "merhaba"
 }
 
 ###
@@ -57,7 +57,7 @@ Foundry-Features: HostedAgents=V1Preview
   "definition": {
     "kind": "hosted",
     "container_configuration": {
-      "image": "julyeducation.azurecr.io/simple-agent:v2"
+      "image": "julyeducation.azurecr.io/simple-agent:v3"
     },
     "cpu": "1",
     "memory": "2Gi",
