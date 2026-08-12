@@ -39,12 +39,12 @@ GET {{DeployFoundryCustomerAgent_HostAddress}}/readiness
 #   2. TOKEN almak için terminalde şunu çalıştırın:
 #      az account get-access-token --resource https://ai.azure.com --query accessToken -o tsv
 # =============================================================================
-@Foundry_Account    = education-test-resource
-@Foundry_Project    = education
+@Foundry_Account    = julyeducation
+@Foundry_Project    = proj-july-education
 @Foundry_BaseUrl    = https://{{Foundry_Account}}.services.ai.azure.com/api/projects/{{Foundry_Project}}
 @Foundry_ApiVersion = v1
-@Foundry_Token      = <az account get-access-token --resource https://ai.azure.com --query accessToken -o tsv>
-@Foundry_AgentName  = SimpleCustomerAgent
+@Foundry_Token      = eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6ImZFdHFyaEtUMWJYQUdhZlNkUW9OMXZYVFJwSSIsImtpZCI6ImZFdHFyaEtUMWJYQUdhZlNkUW9OMXZYVFJwSSJ9.eyJhdWQiOiJodHRwczovL2FpLmF6dXJlLmNvbSIsImlzcyI6Imh0dHBzOi8vc3RzLndpbmRvd3MubmV0LzQzZDU2OWZmLWFlMGMtNDA0Zi05NDcwLWRmODgzZTZhYzY4ZC8iLCJpYXQiOjE3ODY1NjYwOTAsIm5iZiI6MTc4NjU2NjA5MCwiZXhwIjoxNzg2NTcxMDExLCJhY3IiOiIxIiwiYWlvIjoiQWFRQVcvOGNBQUFBeUxYdTJUelVGRitsN1J5S0twc2ROUVlaVnBBZzE4cDZ4clFkQzZHZXBkUUluKzFJd1ZLZ0lXS1htUmdmWE1ydE1PSTU5cnNBWkg3TjJFTHhGbVlKRWdkYUtlN0wvcWdjb1JrcmlpSURkV1NkVit3RUJhNUxUUDBHdkpUSGR6Wjh0aCtCRUViRk5SWHpHK0N2TnRpNE1TNEoxNm16cUtUOHJic1JoMVF4S0dDYWwvV1lLY0hVVjUrWGRCQzV4Y0pOOUhndWMvWEEwdTlUbUdrWm5iYkRkUT09IiwiYWx0c2VjaWQiOiIxOmxpdmUuY29tOjAwMDNCRkZEMUFERTNFNTQiLCJhbXIiOlsicHdkIiwibWZhIl0sImFwcGlkIjoiMDRiMDc3OTUtOGRkYi00NjFhLWJiZWUtMDJmOWUxYmY3YjQ2IiwiYXBwaWRhY3IiOiIwIiwiZW1haWwiOiJmLWNha2lyb2dsdUBvdXRsb29rLmNvbSIsImZhbWlseV9uYW1lIjoiw4dha8Sxcm_En2x1IiwiZ2l2ZW5fbmFtZSI6IkZhdGloIiwiZ3JvdXBzIjpbIjdlYTU5NmU4LWY3NjEtNGQ3Ny04MDY2LTAyN2EwYjc0ZGZmNiIsImVkMDM2ODc4LTY0NjItNDg4Zi05NTFhLTZiY2E4ZjQ3OTNjNSIsIjkzYmRlZjAwLTM5NjktNGYzZi1hZDBmLTk2ZjFhNjc5NmExNiIsIjVmNGUwNTc5LTUwYmQtNGY0My04NWEyLTUzOGIwYWFiMWM5MSIsImU0ZmVjZDcxLTFhZWEtNDdlMC1iYzkzLTZlYzdmNDI4ZTY5NyIsIjAzN2MyMTQ3LTdjOTEtNGM4NC1iOTFkLTY1NTYwMjQ4NzI5MiIsIjM3Njk1ZjZiLTcyNjQtNDFhOS05MTIxLWE5OTgyNzQ4ODg0OSJdLCJpZHAiOiJsaXZlLmNvbSIsImlkdHlwIjoidXNlciIsImlwYWRkciI6Ijc4LjE4MC4xNDguMTQ5IiwibmFtZSI6IkZhdGloIMOHYWvEsXJvxJ9sdSIsIm9pZCI6ImM4NzIyMDg3LWVkMzAtNDVlNi1hM2FmLWY3ZmExNWI3ZDMyZiIsInB1aWQiOiIxMDAzMjAwMDM4M0Y1MjkzIiwicmgiOiIxLkFRd0FfMm5WUXd5dVQwQ1VjTi1JUG1yR2pWOXZwaGpmMnhkTW5kY1dOSEVxbkw0QUFFZ01BQS4iLCJzY3AiOiJ1c2VyX2ltcGVyc29uYXRpb24iLCJzaWQiOiIwMDdiZWVhYS02ZTAyLTExOTItNTI5OS1hMTk1OGVmMmIzNWIiLCJzdWIiOiItaEVMMW45emtnQ0dFUUp0bVM3QmJfZHNhOUw3WjVlRjV3MWZheWV0VVc4IiwidGlkIjoiNDNkNTY5ZmYtYWUwYy00MDRmLTk0NzAtZGY4ODNlNmFjNjhkIiwidW5pcXVlX25hbWUiOiJsaXZlLmNvbSNmLWNha2lyb2dsdUBvdXRsb29rLmNvbSIsInV0aSI6IjVaWDhWRURKXzAtclBiQkZvRUhHQUEiLCJ2ZXIiOiIxLjAiLCJ4bXNfYWN0X2ZjdCI6IjUgMyIsInhtc19mdGQiOiJQRS00V29RTUR4RUhmV3VmeEdscUtRVkVpMlBsVi1mMjNaNWo0VEszekFFQmMzZGxaR1Z1WXkxa2MyMXoiLCJ4bXNfaWRyZWwiOiIyOCAxIiwieG1zX3N1Yl9mY3QiOiI4IDMifQ.fVeO2SPmzp-0RmhIWCmevXl958f4pD13RFhL1z-5rndtvjVI97p0QoC9RTyy98NulKBf8Sa2HH15GkW22mMTxTDokScSC8ODoJM8AhTVkj30IO9zyLlwgZE-aa10k8a5mfHL8QSU2qVcU929meQCAxm0FMGGeEv76CGQ7tkq63MYD5_kyPgv_uNuGyO_1xJV6X3fuLlTyGLglGZ58_HXdb1rx-sWC54zEys3KauSo42MlDXrllBmirMF9LWCZULEeWua87KEOCJToQRKWbkB3z7xpQYnwVuhtalnpqv6ZcMRbQolEhluR5QSRGwDcUtFUuYTnR2RS2O-bF3Fc5NFsg
+@Foundry_AgentName  = SimpleAgentDeploy
 
 
 ### 4. [DEPLOY] Agent oluştur (ilk deploy — version 1 oluşturulur)
@@ -86,7 +86,8 @@ Foundry-Features: HostedAgents=V1Preview
 ###
 
 ### 6. [INVOKE] Agent'ı çağır — Responses protokolü (OpenAI uyumlu)
-POST {{Foundry_BaseUrl}}/agents/{{Foundry_AgentName}}/endpoint/protocols/openai/responses?api-version={{Foundry_ApiVersion}}
+POST {{Foundry_BaseUrl}}/agents/{{Foundry_AgentName}}/endpoint/protocols/openai/responses?
+    api-version={{Foundry_ApiVersion}}
 Authorization: Bearer {{Foundry_Token}}
 Content-Type: application/json
 Foundry-Features: HostedAgents=V1Preview
