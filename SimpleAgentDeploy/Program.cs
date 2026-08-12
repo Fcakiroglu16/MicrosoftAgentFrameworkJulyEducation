@@ -1,4 +1,6 @@
-﻿using Microsoft.Agents.AI;
+﻿using Azure.AI.Projects;
+using Azure.Identity;
+using Microsoft.Agents.AI;
 using Microsoft.Agents.AI.Foundry.Hosting;
 using Microsoft.Extensions.AI;
 using OpenAI;
@@ -13,11 +15,10 @@ if (string.IsNullOrWhiteSpace(apiKey))
 var chatClient = new OpenAIClient(apiKey)
     .GetChatClient("gpt-4o")
     .AsIChatClient();
-
 var stockService = new StockService();
 
 
-var aiAgent = chatClient.AsAIAgent(new ChatClientAgentOptions
+var agent = chatClient.AsAIAgent(new ChatClientAgentOptions
 {
     Name = "StockCheckAgent",
     Description = "Checks stock availability for the requested product and quantity by calling a tool.",
@@ -35,7 +36,30 @@ var aiAgent = chatClient.AsAIAgent(new ChatClientAgentOptions
 });
 
 
-builder.Services.AddFoundryResponses(aiAgent);
+
+
+
+
+// var projectEndpoint = new Uri("https://julyeducation.services.ai.azure.com/api/projects/proj-july-education");
+// var deployment = "gpt-5-mini";
+//
+// var client= new AIProjectClient(projectEndpoint, new DefaultAzureCredential());
+// AIAgent agent = client
+//     .AsAIAgent(
+//         model: deployment,
+//         instructions: """
+//                       You are a stock control assistant.
+//                       - You will receive a natural language question asking about the stock availability of a product (e.g. "5 adet Kalem stokta var mı?").
+//                       - You MUST extract the product name and quantity from the question, then call the CheckStock tool with them to verify availability.
+//                       - If the quantity is not specified, assume a quantity of 1.
+//                       - Report the order (product and quantity) together with the stock check result returned by the tool.
+//                       """,
+//         name: "StockCheckAgent",tools: [AIFunctionFactory.Create(stockService.CheckStock)]);
+
+
+
+
+builder.Services.AddFoundryResponses(agent);
 builder.RegisterProtocol("responses", endpoints => endpoints.MapFoundryResponses());
 
 var app = builder.Build();

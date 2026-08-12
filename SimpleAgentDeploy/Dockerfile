@@ -7,7 +7,7 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["SimpleAgentDeploy.csproj", "SimpleAgentDeploy/"]
 RUN dotnet restore "./SimpleAgentDeploy/SimpleAgentDeploy.csproj"
-COPY . .
+COPY . ./SimpleAgentDeploy
 WORKDIR "/src/SimpleAgentDeploy"
 RUN dotnet build "./SimpleAgentDeploy.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
