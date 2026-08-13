@@ -3,8 +3,14 @@
 ### 1. Yeni sohbet başlat (conversationId göndermiyoruz)
 ### Sequential orkestrasyon: OrderIntakeAgent -> StockCheckAgent -> InvoiceAgent
 ### Ürün + adet içeren doğal dilde bir sipariş isteği gönderin.
+### NOT: Üretimde bu header'ları Foundry platformu otomatik ekler (x-agent-user-isolation-key,
+### x-agent-chat-isolation-key). Yerelde (localhost) test ederken bu header'lar olmadan
+### "HostedSessionIsolationKeyProvider returned null" hatasıyla 500 alırsınız; bu yüzden
+### yerel testlerde aşağıdaki gibi manuel olarak eklemeniz gerekir.
 POST {{DeployWorkflowAgent_HostAddress}}/responses
 Content-Type: application/json
+x-agent-user-isolation-key: local-dev-user
+x-agent-chat-isolation-key: local-dev-chat
 
 {
   "input": "5 adet Defter sipariş etmek istiyorum."
@@ -30,13 +36,13 @@ GET {{DeployWorkflowAgent_HostAddress}}/readiness
 @Foundry_Project    = proj-july-education
 @Foundry_BaseUrl    = https://{{Foundry_Account}}.services.ai.azure.com/api/projects/{{Foundry_Project}}
 @Foundry_ApiVersion = v1
-@Foundry_Token      = ******
+@Foundry_Token      = ****
 @Foundry_AgentName  = WorkflowAgent
 
 
 ### 3. [DEPLOY] Agent oluştur (ilk deploy — version 1 oluşturulur)
 POST {{Foundry_BaseUrl}}/agents/{{Foundry_AgentName}}/versions?api-version={{Foundry_ApiVersion}}
-Authorization: ******
+Authorization: Bearer {{Foundry_Token}}
 Content-Type: application/json
 
 {

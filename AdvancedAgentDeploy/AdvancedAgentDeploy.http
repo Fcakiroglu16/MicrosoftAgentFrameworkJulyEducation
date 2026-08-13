@@ -3,18 +3,25 @@
 ### 1. Yeni sohbet başlat (conversationId göndermiyoruz)
 ### StockCheckAgent, doğal dilde sorulan bir stok sorusunu anlar (ürün + adet)
 ### ve CheckStock tool'unu çağırarak stok tablosundan (Kalem, Defter, Silgi, Kitap) kontrol yapar.
+### NOT: Üretimde bu header'ları Foundry platformu otomatik ekler (x-agent-user-isolation-key,
+### x-agent-chat-isolation-key). Yerelde (localhost) test ederken bu header'lar olmadan
+### "HostedSessionIsolationKeyProvider returned null" hatasıyla 500 alırsınız; bu yüzden
+### yerel testlerde aşağıdaki gibi manuel olarak eklemeniz gerekir.
 POST {{DeployFoundryCustomerAgent_HostAddress}}/responses
 Content-Type: application/json
+x-agent-user-isolation-key: local-dev-user
+x-agent-chat-isolation-key: local-dev-chat
 
 {
   "input": "merhaba"
 }
-
 ###
 ### 2. Aynı oturumu devam ettir
 ### Yanıttaki "id" değerini conversationId olarak gönder
 POST {{DeployFoundryCustomerAgent_HostAddress}}/responses
 Content-Type: application/json
+x-agent-user-isolation-key: local-dev-user
+x-agent-chat-isolation-key: local-dev-chat
 
 {
   "input": "biraz önce ne dedim.",
