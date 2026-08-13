@@ -5,9 +5,9 @@ using Microsoft.Extensions.AI;
 namespace WorkflowAgentDeploy;
 
 /// <summary>
-/// Sequential orkestrasyonu oluşturan 3 alt agent'ı tanımlar:
-/// Sipariş Alma -&gt; Stok Kontrolü -&gt; Fatura.
-/// Her agent, aynı Foundry projesindeki model deployment'ı kullanır.
+///     Sequential orkestrasyonu oluşturan 3 alt agent'ı tanımlar:
+///     Sipariş Alma -&gt; Stok Kontrolü -&gt; Fatura.
+///     Her agent, aynı Foundry projesindeki model deployment'ı kullanır.
 /// </summary>
 public static class SequentialAgents
 {

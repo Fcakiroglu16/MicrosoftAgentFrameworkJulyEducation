@@ -9,14 +9,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Content Include="..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
+        <Content Include="..\.dockerignore">
+            <Link>.dockerignore</Link>
+        </Content>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.Agents.AI.Foundry.Hosting" Version="1.10.0-preview.260610.1" />
-      <PackageReference Include="Microsoft.Agents.AI.Workflows" Version="1.10.0" />
+        <PackageReference Include="Microsoft.Agents.AI.Foundry.Hosting" Version="1.10.0-preview.260610.1"/>
+        <PackageReference Include="Microsoft.Agents.AI.Workflows" Version="1.10.0"/>
     </ItemGroup>
 
 </Project>

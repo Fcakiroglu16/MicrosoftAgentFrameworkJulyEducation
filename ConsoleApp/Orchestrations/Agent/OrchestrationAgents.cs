@@ -4,10 +4,16 @@ using OpenAI;
 
 namespace App.Console.Orchestrations.Agent;
 
-
-
 public static class OrchestrationAgents
 {
+    private static readonly Dictionary<string, int> StockTable = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["Kalem"] = 50,
+        ["Defter"] = 10,
+        ["Silgi"] = 0,
+        ["Kitap"] = 25
+    };
+
     private static IChatClient CreateChatClient()
     {
         var apiKey = Environment.GetEnvironmentVariable("OPEN_AI_KEY");
@@ -19,16 +25,7 @@ public static class OrchestrationAgents
             .AsIChatClient();
     }
 
-  
-    private static readonly Dictionary<string, int> StockTable = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ["Kalem"] = 50,
-        ["Defter"] = 10,
-        ["Silgi"] = 0,
-        ["Kitap"] = 25
-    };
 
- 
     private static string CheckStock(string productName, int quantity)
     {
         if (!StockTable.TryGetValue(productName, out var available))
@@ -39,7 +36,7 @@ public static class OrchestrationAgents
             : $"Stok yetersiz: '{productName}' için istenen {quantity} adet karşılanamıyor (stokta yalnızca {available} adet var).";
     }
 
-  
+
     public static ChatClientAgent GetOrderIntakeAgent()
     {
         var chatClient = CreateChatClient();
@@ -60,7 +57,7 @@ public static class OrchestrationAgents
         });
     }
 
-  
+
     public static ChatClientAgent GetStockCheckAgent()
     {
         var chatClient = CreateChatClient();
@@ -82,7 +79,7 @@ public static class OrchestrationAgents
         });
     }
 
-    
+
     public static ChatClientAgent GetInvoiceAgent()
     {
         var chatClient = CreateChatClient();

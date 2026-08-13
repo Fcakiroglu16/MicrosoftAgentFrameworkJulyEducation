@@ -3,13 +3,8 @@ using Microsoft.Extensions.AI;
 
 namespace App.API.Workflow.Sequential;
 
-
-
 public class OrchestrationAgents(IChatClient chatClient)
 {
-
-
-
     private static readonly Dictionary<string, int> StockTable = new(StringComparer.OrdinalIgnoreCase)
     {
         ["Kalem"] = 50,
@@ -32,8 +27,6 @@ public class OrchestrationAgents(IChatClient chatClient)
 
     public ChatClientAgent GetOrderIntakeAgent()
     {
-
-
         return chatClient.AsAIAgent(new ChatClientAgentOptions
         {
             Name = "OrderIntakeAgent",
@@ -53,8 +46,6 @@ public class OrchestrationAgents(IChatClient chatClient)
 
     public ChatClientAgent GetStockCheckAgent()
     {
-
-
         return chatClient.AsAIAgent(new ChatClientAgentOptions
         {
             Name = "StockCheckAgent",
@@ -75,8 +66,6 @@ public class OrchestrationAgents(IChatClient chatClient)
 
     public ChatClientAgent GetInvoiceAgent()
     {
-
-
         return chatClient.AsAIAgent(new ChatClientAgentOptions
         {
             Name = "InvoiceAgent",

@@ -6,18 +6,17 @@ using OpenAI;
 namespace App.Console.Orchestrations.GroupChat;
 
 /// <summary>
-/// Group Chat Orchestration örneği:
-/// Birden fazla ajan ORTAK bir sohbette konuşur. Kimin ne zaman konuşacağına
-/// ortadaki bir "manager" (orkestratör) karar verir. Burada en basit strateji olan
-/// sıralı (round-robin) seçim kullanılıyor:
-/// Yazar -> Editör -> Pazarlama -> Hukuk -> Yazar -> ...
-///
-/// Senaryo: Bir kahve markası için slogan üretme toplantısı.
-///   SloganYazarAgent : slogan önerir
-///   EditorAgent      : dil ve etki açısından eleştirir
-///   PazarlamaAgent   : hedef kitleye uygunluğunu değerlendirir
-///   HukukAgent       : yasal/marka riski var mı diye bakar
-/// Ajanlar tüm sohbet geçmişini gördüğü için her turda slogan biraz daha iyileşir.
+///     Group Chat Orchestration örneği:
+///     Birden fazla ajan ORTAK bir sohbette konuşur. Kimin ne zaman konuşacağına
+///     ortadaki bir "manager" (orkestratör) karar verir. Burada en basit strateji olan
+///     sıralı (round-robin) seçim kullanılıyor:
+///     Yazar -> Editör -> Pazarlama -> Hukuk -> Yazar -> ...
+///     Senaryo: Bir kahve markası için slogan üretme toplantısı.
+///     SloganYazarAgent : slogan önerir
+///     EditorAgent      : dil ve etki açısından eleştirir
+///     PazarlamaAgent   : hedef kitleye uygunluğunu değerlendirir
+///     HukukAgent       : yasal/marka riski var mı diye bakar
+///     Ajanlar tüm sohbet geçmişini gördüğü için her turda slogan biraz daha iyileşir.
 /// </summary>
 public static class GroupChatSloganWorkflow
 {
@@ -31,7 +30,7 @@ public static class GroupChatSloganWorkflow
         System.Console.WriteLine();
         System.Console.WriteLine($"Görev: {task}");
 
-        List<ChatMessage> conversation = await ExecuteAsync(task);
+        var conversation = await ExecuteAsync(task);
 
         System.Console.WriteLine();
         System.Console.WriteLine();
@@ -99,14 +98,13 @@ public static class GroupChatSloganWorkflow
 
         var messages = new List<ChatMessage> { new(ChatRole.User, task) };
 
-        await using StreamingRun run = await InProcessExecution.RunStreamingAsync(workflow, messages);
-        await run.TrySendMessageAsync(new TurnToken(emitEvents: true));
+        await using var run = await InProcessExecution.RunStreamingAsync(workflow, messages);
+        await run.TrySendMessageAsync(new TurnToken(true));
 
         string? lastExecutorId = null;
         List<ChatMessage> conversation = new();
 
-        await foreach (WorkflowEvent evt in run.WatchStreamAsync())
-        {
+        await foreach (var evt in run.WatchStreamAsync())
             if (evt is AgentResponseUpdateEvent e)
             {
                 // Hangi ajanın sırası geldiğini görmek group chat akışını anlamayı kolaylaştırır.
@@ -126,7 +124,6 @@ public static class GroupChatSloganWorkflow
                 conversation = output.As<List<ChatMessage>>()!;
                 break;
             }
-        }
 
         return conversation;
     }

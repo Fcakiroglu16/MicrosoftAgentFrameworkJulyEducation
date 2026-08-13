@@ -18,13 +18,13 @@ var orderAgent = SequentialAgents.GetOrderIntakeAgent(projectClient, deployment)
 var stockCheckAgent = SequentialAgents.GetStockCheckAgent(projectClient, deployment);
 var invoiceAgent = SequentialAgents.GetInvoiceAgent(projectClient, deployment);
 
-Workflow workflow = AgentWorkflowBuilder.BuildSequential([orderAgent, stockCheckAgent, invoiceAgent]);
+var workflow = AgentWorkflowBuilder.BuildSequential(orderAgent, stockCheckAgent, invoiceAgent);
 
 // Workflow'u tek bir AIAgent gibi dışa açıyoruz ki Foundry Responses protokolü üzerinden yayınlanabilsin.
 var workflowAgent = workflow.AsAIAgent(
-    id: "sequential-order-workflow",
-    name: "SequentialOrderWorkflowAgent",
-    description: "Sipariş Alma -> Stok Kontrolü -> Fatura adımlarını sırayla çalıştıran orkestrasyon agent'ı.");
+    "sequential-order-workflow",
+    "SequentialOrderWorkflowAgent",
+    "Sipariş Alma -> Stok Kontrolü -> Fatura adımlarını sırayla çalıştıran orkestrasyon agent'ı.");
 
 builder.Services.AddFoundryResponses(workflowAgent);
 builder.RegisterProtocol("responses", endpoints => endpoints.MapFoundryResponses());

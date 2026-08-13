@@ -15,6 +15,7 @@ x-agent-chat-isolation-key: local-dev-chat
 {
   "input": "merhaba"
 }
+
 ###
 ### 2. Aynı oturumu devam ettir
 ### Yanıttaki "id" değerini conversationId olarak gönder

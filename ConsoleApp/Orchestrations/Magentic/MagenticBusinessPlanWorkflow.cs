@@ -10,16 +10,15 @@ using OpenAI;
 namespace App.Console.Orchestrations.Magentic;
 
 /// <summary>
-/// Magentic Orchestration örneği:
-/// Group Chat'e benzer ama ortadaki "manager" çok daha akıllıdır.
-/// Manager önce bir PLAN yapar, sonra her adımda hangi ajanın konuşacağına
-/// duruma göre karar verir, ilerlemeyi takip eder ve tıkanırsa planı yeniler.
-/// Bu yüzden çözüm yolunun baştan belli olmadığı, açık uçlu görevler için uygundur.
-///
-/// Senaryo: "İstanbul'da küçük bir kahve dükkanı açmak istiyorum" analizi.
-///   ArastirmaAgent : maliyet kalemlerini ve piyasa bilgisini toplar
-///   HesaplamaAgent : toplama/başabaş noktası gibi sayısal hesapları yapar
-///   MagenticManager: planı kurar, sırayı yönetir, sonucu özetler
+///     Magentic Orchestration örneği:
+///     Group Chat'e benzer ama ortadaki "manager" çok daha akıllıdır.
+///     Manager önce bir PLAN yapar, sonra her adımda hangi ajanın konuşacağına
+///     duruma göre karar verir, ilerlemeyi takip eder ve tıkanırsa planı yeniler.
+///     Bu yüzden çözüm yolunun baştan belli olmadığı, açık uçlu görevler için uygundur.
+///     Senaryo: "İstanbul'da küçük bir kahve dükkanı açmak istiyorum" analizi.
+///     ArastirmaAgent : maliyet kalemlerini ve piyasa bilgisini toplar
+///     HesaplamaAgent : toplama/başabaş noktası gibi sayısal hesapları yapar
+///     MagenticManager: planı kurar, sırayı yönetir, sonucu özetler
 /// </summary>
 public static class MagenticBusinessPlanWorkflow
 {
@@ -38,11 +37,11 @@ public static class MagenticBusinessPlanWorkflow
 
         var workflow = BuildWorkflow();
 
-        await using StreamingRun run = await InProcessExecution.RunStreamingAsync(
+        await using var run = await InProcessExecution.RunStreamingAsync(
             workflow,
             new List<ChatMessage> { new(ChatRole.User, TaskPrompt) });
 
-        await run.TrySendMessageAsync(new TurnToken(emitEvents: true));
+        await run.TrySendMessageAsync(new TurnToken(true));
 
         // Ajan cevapları parça parça (streaming) gelir. Konsolun karışmaması için
         // parçaları biriktirip cevap tamamlandığında tek blok halinde yazdırıyoruz.
@@ -61,15 +60,14 @@ public static class MagenticBusinessPlanWorkflow
             currentResponseId = null;
         }
 
-        await foreach (WorkflowEvent workflowEvent in run.WatchStreamAsync())
-        {
+        await foreach (var workflowEvent in run.WatchStreamAsync())
             switch (workflowEvent)
             {
                 case AgentResponseUpdateEvent updateEvent:
                     // Aynı cevabın parçalarını gruplamak için ResponseId kullanılır.
-                    string responseId = updateEvent.Update.ResponseId
-                        ?? updateEvent.Update.MessageId
-                        ?? updateEvent.ExecutorId;
+                    var responseId = updateEvent.Update.ResponseId
+                                     ?? updateEvent.Update.MessageId
+                                     ?? updateEvent.ExecutorId;
 
                     if (!string.Equals(responseId, currentResponseId, StringComparison.Ordinal))
                     {
@@ -96,7 +94,7 @@ public static class MagenticBusinessPlanWorkflow
                 case MagenticProgressLedgerUpdatedEvent progressUpdated:
                     // Manager her turda "hedefe ulaşıldı mı, sıradaki kim" diye karar verir.
                     FlushAgentResponse();
-                    MagenticProgressLedger ledger = progressUpdated.ProgressLedger;
+                    var ledger = progressUpdated.ProgressLedger;
                     WriteBlock(
                         "MANAGER > İLERLEME DURUMU",
                         $"Tamamlandı mı : {ledger.IsRequestSatisfied}{Environment.NewLine}" +
@@ -114,7 +112,8 @@ public static class MagenticBusinessPlanWorkflow
 
                 case WorkflowErrorEvent workflowError:
                     FlushAgentResponse();
-                    WriteBlock("HATA", workflowError.Exception?.ToString() ?? "Bilinmeyen workflow hatası.", ConsoleColor.Red);
+                    WriteBlock("HATA", workflowError.Exception?.ToString() ?? "Bilinmeyen workflow hatası.",
+                        ConsoleColor.Red);
                     break;
 
                 case ExecutorFailedEvent executorFailed:
@@ -125,7 +124,6 @@ public static class MagenticBusinessPlanWorkflow
                         ConsoleColor.Red);
                     break;
             }
-        }
 
         FlushAgentResponse();
 
@@ -134,8 +132,9 @@ public static class MagenticBusinessPlanWorkflow
             System.Console.WriteLine();
             WriteBlock("FİNAL SONUÇ", string.Empty, ConsoleColor.Green);
 
-            foreach (ChatMessage message in transcript)
-                WriteBlock(message.AuthorName ?? message.Role.ToString(), message.Text?.Trim() ?? string.Empty, ConsoleColor.Green);
+            foreach (var message in transcript)
+                WriteBlock(message.AuthorName ?? message.Role.ToString(), message.Text?.Trim() ?? string.Empty,
+                    ConsoleColor.Green);
         }
     }
 
@@ -190,7 +189,7 @@ public static class MagenticBusinessPlanWorkflow
 
         return new MagenticWorkflowBuilder(manager)
             // Ekibe katılan uzman ajanlar. Manager sırayı bunlar arasından seçer.
-            .AddParticipants([researcher, calculator])
+            .AddParticipants(researcher, calculator)
             // Workflow'un adı; loglarda/izlemede bu akışı tanımak için kullanılır.
             .WithName("Magentic Business Plan Workflow")
             // Workflow'un ne yaptığını anlatan açıklama (dokümantasyon/izleme amaçlı).
@@ -202,7 +201,7 @@ public static class MagenticBusinessPlanWorkflow
             // Sonsuz döngüye girip maliyet çıkarmasını engelleyen güvenlik sınırı.
             .WithMaxRounds(10)
             // Üst üste 3 tur ilerleme olmazsa (takılma) manager planı yeniden kurar.
-            .WithMaxStalls(3)
+            .WithMaxStalls()
             // Plan en fazla 2 kez sıfırlanabilir; sonrasında workflow sonlanır.
             .WithMaxResets(2)
             .Build();

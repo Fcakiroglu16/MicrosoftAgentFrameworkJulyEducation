@@ -1,12 +1,6 @@
-﻿
-using Azure.AI.Projects;
-using Azure.Identity;
-using Microsoft.Agents.AI;
-using Microsoft.Agents.AI.Foundry.Hosting;
+﻿using Microsoft.Agents.AI.Foundry.Hosting;
 using Microsoft.Extensions.AI;
 using OpenAI;
-
-
 
 var apiKey = Environment.GetEnvironmentVariable("OPEN_AI_KEY");
 if (string.IsNullOrWhiteSpace(apiKey))
@@ -15,10 +9,9 @@ if (string.IsNullOrWhiteSpace(apiKey))
 var chatClient = new OpenAIClient(apiKey)
     .GetChatClient("gpt-4o")
     .AsIChatClient();
-var agent= chatClient.AsAIAgent(
-    instructions: "You are a helpful AI assistant.",
-    name: "my-agent");
-
+var agent = chatClient.AsAIAgent(
+    "You are a helpful AI assistant.",
+    "my-agent");
 
 
 // var projectEndpoint = new Uri("https://julyeducation.services.ai.azure.com/api/projects/proj-july-education");

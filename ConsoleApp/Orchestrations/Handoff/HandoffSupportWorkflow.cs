@@ -6,15 +6,14 @@ using OpenAI;
 namespace App.Console.Orchestrations.Handoff;
 
 /// <summary>
-/// Handoff Orchestration örneği:
-/// Bir "Karşılama (Triage)" ajanı gelen soruyu okur ve konuya göre
-/// ilgili uzman ajana sohbeti DEVREDER (handoff). Devralan ajan konuşmanın
-/// tamamını görür ve cevabı o verir.
-///
-/// Senaryo: Basit bir e-ticaret müşteri hizmetleri hattı.
-///   TriageAgent  -> KargoAgent | IadeAgent
-///   KargoAgent   -> TriageAgent
-///   IadeAgent    -> TriageAgent
+///     Handoff Orchestration örneği:
+///     Bir "Karşılama (Triage)" ajanı gelen soruyu okur ve konuya göre
+///     ilgili uzman ajana sohbeti DEVREDER (handoff). Devralan ajan konuşmanın
+///     tamamını görür ve cevabı o verir.
+///     Senaryo: Basit bir e-ticaret müşteri hizmetleri hattı.
+///     TriageAgent  -> KargoAgent | IadeAgent
+///     KargoAgent   -> TriageAgent
+///     IadeAgent    -> TriageAgent
 /// </summary>
 public static class HandoffSupportWorkflow
 {
@@ -44,7 +43,7 @@ public static class HandoffSupportWorkflow
             var newMessages = await RunTurnAsync(workflow, messages);
 
             // Bu turda üretilen yeni mesajları geçmişe ekle.
-           messages.AddRange(newMessages.Skip(messages.Count));
+            messages.AddRange(newMessages.Skip(messages.Count));
         }
 
         System.Console.WriteLine();
@@ -60,38 +59,38 @@ public static class HandoffSupportWorkflow
 
         var triageAgent = CreateAgent(
             chatClient,
-            name: "TriageAgent",
-            description: "Gelen müşteri sorusunu doğru uzmana yönlendirir.",
-            instructions: """
-                          Sen bir müşteri hizmetleri karşılama asistanısın.
-                          - Müşterinin sorusunu oku ve konusunu belirle.
-                          - Kargo/teslimat ile ilgiliyse KargoAgent'a devret.
-                          - İade/iptal/para iadesi ile ilgiliyse IadeAgent'a devret.
-                          - Soruyu KENDİN cevaplama, HER ZAMAN uygun ajana devret.
-                          - Devretmeden önce tek cümlelik kısa bir bilgilendirme yaz.
-                          """);
+            "TriageAgent",
+            "Gelen müşteri sorusunu doğru uzmana yönlendirir.",
+            """
+            Sen bir müşteri hizmetleri karşılama asistanısın.
+            - Müşterinin sorusunu oku ve konusunu belirle.
+            - Kargo/teslimat ile ilgiliyse KargoAgent'a devret.
+            - İade/iptal/para iadesi ile ilgiliyse IadeAgent'a devret.
+            - Soruyu KENDİN cevaplama, HER ZAMAN uygun ajana devret.
+            - Devretmeden önce tek cümlelik kısa bir bilgilendirme yaz.
+            """);
 
         var kargoAgent = CreateAgent(
             chatClient,
-            name: "KargoAgent",
-            description: "Kargo ve teslimat sorularını yanıtlar.",
-            instructions: """
-                          Sen bir kargo ve teslimat uzmanısın.
-                          - Sadece kargo, teslimat süresi ve takip numarası konularında yardımcı ol.
-                          - Kısa, net ve Türkçe cevap ver.
-                          - Konu senin alanın dışındaysa TriageAgent'a geri devret.
-                          """);
+            "KargoAgent",
+            "Kargo ve teslimat sorularını yanıtlar.",
+            """
+            Sen bir kargo ve teslimat uzmanısın.
+            - Sadece kargo, teslimat süresi ve takip numarası konularında yardımcı ol.
+            - Kısa, net ve Türkçe cevap ver.
+            - Konu senin alanın dışındaysa TriageAgent'a geri devret.
+            """);
 
         var iadeAgent = CreateAgent(
             chatClient,
-            name: "IadeAgent",
-            description: "İade ve iptal sorularını yanıtlar.",
-            instructions: """
-                          Sen bir iade ve iptal uzmanısın.
-                          - Sadece iade koşulları, iade adımları ve para iadesi konularında yardımcı ol.
-                          - Kısa, net ve Türkçe cevap ver.
-                          - Konu senin alanın dışındaysa TriageAgent'a geri devret.
-                          """);
+            "IadeAgent",
+            "İade ve iptal sorularını yanıtlar.",
+            """
+            Sen bir iade ve iptal uzmanısın.
+            - Sadece iade koşulları, iade adımları ve para iadesi konularında yardımcı ol.
+            - Kısa, net ve Türkçe cevap ver.
+            - Konu senin alanın dışındaysa TriageAgent'a geri devret.
+            """);
 
         // Handoff kuralları: kimin kime devredebileceğini burada tanımlıyoruz.
         return AgentWorkflowBuilder.CreateHandoffBuilderWith(triageAgent)
@@ -102,14 +101,13 @@ public static class HandoffSupportWorkflow
 
     private static async Task<List<ChatMessage>> RunTurnAsync(Workflow workflow, List<ChatMessage> messages)
     {
-        await using StreamingRun run = await InProcessExecution.RunStreamingAsync(workflow, messages);
-        await run.TrySendMessageAsync(new TurnToken(emitEvents: true));
+        await using var run = await InProcessExecution.RunStreamingAsync(workflow, messages);
+        await run.TrySendMessageAsync(new TurnToken(true));
 
         string? lastExecutorId = null;
         List<ChatMessage> newMessages = new();
 
-        await foreach (WorkflowEvent evt in run.WatchStreamAsync())
-        {
+        await foreach (var evt in run.WatchStreamAsync())
             if (evt is AgentResponseUpdateEvent e)
             {
                 // Hangi ajanın konuştuğunu görmek handoff'u anlamak için önemli.
@@ -119,7 +117,7 @@ public static class HandoffSupportWorkflow
                     System.Console.WriteLine();
                     System.Console.Write($"{e.ExecutorId}: ");
                 }
-                
+
                 System.Console.Write(e.Update.Text);
             }
             else if (evt is WorkflowOutputEvent outputEvt)
@@ -127,13 +125,15 @@ public static class HandoffSupportWorkflow
                 newMessages = outputEvt.As<List<ChatMessage>>()!;
                 break;
             }
-        }
 
         return newMessages;
     }
 
-    private static ChatClientAgent CreateAgent(IChatClient chatClient, string name, string description, string instructions) =>
-        new(chatClient, instructions, name, description);
+    private static ChatClientAgent CreateAgent(IChatClient chatClient, string name, string description,
+        string instructions)
+    {
+        return new ChatClientAgent(chatClient, instructions, name, description);
+    }
 
     private static IChatClient CreateChatClient()
     {

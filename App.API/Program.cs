@@ -1,7 +1,5 @@
 using App.API.Workflow.Sequential;
-
 using Microsoft.Extensions.AI;
-
 using OpenAI;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,24 +25,19 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) app.MapOpenApi();
 
-app.MapPost("/api/sequential-order-workflow", async (SequentialOrderWorkflowRequest request, SequentialOrderWorkflow sequentialOrderWorkflow) =>
-{
-    if (string.IsNullOrWhiteSpace(request.OrderRequest))
-        return Results.BadRequest("OrderRequest boş olamaz.");
+app.MapPost("/api/sequential-order-workflow",
+        async (SequentialOrderWorkflowRequest request, SequentialOrderWorkflow sequentialOrderWorkflow) =>
+        {
+            if (string.IsNullOrWhiteSpace(request.OrderRequest))
+                return Results.BadRequest("OrderRequest boş olamaz.");
 
-    List<ChatMessage> result = await sequentialOrderWorkflow.ExecuteAsync(request.OrderRequest);
-
-
-    return Results.Ok(result.Select(x => x.Text));
-})
-.WithName("SequentialOrderWorkflow")
-.WithSummary("Sipariş -> Stok Kontrolü -> Fatura sequential agent workflow'unu çalıştırır.");
+            var result = await sequentialOrderWorkflow.ExecuteAsync(request.OrderRequest);
 
 
-
-
-
-
+            return Results.Ok(result.Select(x => x.Text));
+        })
+    .WithName("SequentialOrderWorkflow")
+    .WithSummary("Sipariş -> Stok Kontrolü -> Fatura sequential agent workflow'unu çalıştırır.");
 
 
 app.Run();

@@ -12,7 +12,7 @@ public static class ConcurrentTranslationWorkflow
         System.Console.WriteLine();
         System.Console.WriteLine("=== Concurrent Orchestration: Çeviri (TR -> EN / DE / FR) ===");
 
-        List<ChatMessage> result = await ExecuteAsync(
+        var result = await ExecuteAsync(
             "Merhaba dünya, bugün hava çok güzel!",
             (executorId, text) =>
             {
@@ -29,7 +29,9 @@ public static class ConcurrentTranslationWorkflow
     }
 
     public static Task<List<ChatMessage>> ExecuteAsync(string textToTranslate)
-        => ExecuteAsync(textToTranslate, onExecutorChanged: null, onTextChunk: null);
+    {
+        return ExecuteAsync(textToTranslate, null, null);
+    }
 
     private static async Task<List<ChatMessage>> ExecuteAsync(
         string textToTranslate,
@@ -45,13 +47,12 @@ public static class ConcurrentTranslationWorkflow
 
         var messages = new List<ChatMessage> { new(ChatRole.User, textToTranslate) };
 
-        await using StreamingRun run = await InProcessExecution.RunStreamingAsync(workflow, messages);
-        await run.TrySendMessageAsync(new TurnToken(emitEvents: true));
+        await using var run = await InProcessExecution.RunStreamingAsync(workflow, messages);
+        await run.TrySendMessageAsync(new TurnToken(true));
 
         string? lastExecutorId = null;
         List<ChatMessage> result = new();
-        await foreach (WorkflowEvent evt in run.WatchStreamAsync())
-        {
+        await foreach (var evt in run.WatchStreamAsync())
             if (evt is AgentResponseUpdateEvent e)
             {
                 // if (e.ExecutorId != lastExecutorId)
@@ -67,7 +68,6 @@ public static class ConcurrentTranslationWorkflow
                 result = outputEvt.As<List<ChatMessage>>()!;
                 break;
             }
-        }
 
         return result;
     }
@@ -83,9 +83,11 @@ public static class ConcurrentTranslationWorkflow
             .AsIChatClient();
     }
 
-    private static ChatClientAgent GetTranslationAgent(string targetLanguage, IChatClient chatClient) =>
-        new  ChatClientAgent(chatClient,
+    private static ChatClientAgent GetTranslationAgent(string targetLanguage, IChatClient chatClient)
+    {
+        return new ChatClientAgent(chatClient,
             $"You are a translation assistant who only responds in {targetLanguage}. Respond to any " +
             $"input by outputting the name of the input language and then translating the input to {targetLanguage}.",
-            name: $"{targetLanguage}_Agent");
+            $"{targetLanguage}_Agent");
+    }
 }

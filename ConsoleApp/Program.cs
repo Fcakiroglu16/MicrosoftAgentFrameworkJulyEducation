@@ -1,10 +1,4 @@
-﻿
-using App.Console.Orchestrations.Concurrent;
-using App.Console.Orchestrations.GroupChat;
-using App.Console.Orchestrations.Handoff;
-using App.Console.Orchestrations.Magentic;
-using App.Console.Orchestrations.Sequential;
-
+﻿using App.Console.Orchestrations.Magentic;
 
 Console.WriteLine("Orchestration Workflow");
 
@@ -15,6 +9,3 @@ Console.WriteLine("Orchestration Workflow");
 //await HandoffSupportWorkflow.RunAsync();
 //await GroupChatSloganWorkflow.RunAsync();
 await MagenticBusinessPlanWorkflow.RunAsync();
-
-
-
