@@ -11,7 +11,6 @@ var agentEndpoint = new Uri($"{projectEndpoint}/agents/{agentName}/endpoint/prot
 
 var projectClient = new AIProjectClient(projectEndpoint, new AzureCliCredential());
 
-.
 AIAgent agent = projectClient.AsAIAgent(agentEndpoint);
 
 AgentSession session = await agent.CreateSessionAsync();
