@@ -15,9 +15,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Azure.AI.Projects.OpenAI" Version="2.0.0-beta.1"/>
         <PackageReference Include="Microsoft.Agents.AI" Version="1.17.0"/>
-        <PackageReference Include="Microsoft.Agents.AI.Foundry.Hosting" Version="1.17.0-preview.260804.1"/>
+        <PackageReference Include="Microsoft.Agents.AI.Foundry.Hosting" Version="1.10.0-preview.260610.1" />
         <PackageReference Include="Microsoft.Agents.AI.OpenAI" Version="1.17.0"/>
         <PackageReference Include="Microsoft.Agents.AI.Workflows" Version="1.17.0"/>
     </ItemGroup>
