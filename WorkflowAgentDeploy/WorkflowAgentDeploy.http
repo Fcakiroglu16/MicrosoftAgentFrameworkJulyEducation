@@ -1,0 +1,84 @@
+@DeployWorkflowAgent_HostAddress = http://localhost:8088
+
+### 1. Yeni sohbet başlat (conversationId göndermiyoruz)
+### Sequential orkestrasyon: OrderIntakeAgent -> StockCheckAgent -> InvoiceAgent
+### Ürün + adet içeren doğal dilde bir sipariş isteği gönderin.
+POST {{DeployWorkflowAgent_HostAddress}}/responses
+Content-Type: application/json
+
+{
+  "input": "5 adet Defter sipariş etmek istiyorum."
+}
+
+###
+
+### 2. Sağlık kontrolü
+GET {{DeployWorkflowAgent_HostAddress}}/readiness
+
+###
+
+# =============================================================================
+# FOUNDRY REST API — HOSTED AGENT DEPLOY
+# Kaynak: https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/deploy-hosted-agent
+#
+# Kullanım:
+#   1. Aşağıdaki değişkenleri kendi ortamınıza göre doldurun.
+#   2. TOKEN almak için terminalde şunu çalıştırın:
+#      az account get-access-token --resource https://ai.azure.com --query accessToken -o tsv
+# =============================================================================
+@Foundry_Account    = julyeducation
+@Foundry_Project    = proj-july-education
+@Foundry_BaseUrl    = https://{{Foundry_Account}}.services.ai.azure.com/api/projects/{{Foundry_Project}}
+@Foundry_ApiVersion = v1
+@Foundry_Token      = ******
+@Foundry_AgentName  = WorkflowAgent
+
+
+### 3. [DEPLOY] Agent oluştur (ilk deploy — version 1 oluşturulur)
+POST {{Foundry_BaseUrl}}/agents/{{Foundry_AgentName}}/versions?api-version={{Foundry_ApiVersion}}
+Authorization: ******
+Content-Type: application/json
+
+{
+  "definition": {
+    "kind": "hosted",
+    "container_configuration": {
+      "image": "julyeducation.azurecr.io/workflow-agent:v1"
+    },
+    "cpu": "1",
+    "memory": "2Gi",
+    "protocol_versions": [
+      {
+        "protocol": "responses",
+        "version": "1.0.0"
+      }
+    ],
+    "environment_variables": {
+      "MODEL_DEPLOYMENT_NAME": "gpt-5-mini",
+      "ASPNETCORE_ENVIRONMENT": "Production",
+      "ASPNETCORE_HTTP_PORTS": "8088"
+    }
+  }
+}
+
+###
+
+### 4. [DEPLOY] Version durumunu sorgula — "active" olana kadar tekrarlayın
+### status: provisioning | active | failed | deleted
+GET {{Foundry_BaseUrl}}/agents/{{Foundry_AgentName}}/versions/1?api-version={{Foundry_ApiVersion}}
+Authorization: ******
+
+###
+
+### 5. [INVOKE] Agent'ı çağır — Responses protokolü (OpenAI uyumlu)
+POST {{Foundry_BaseUrl}}/agents/{{Foundry_AgentName}}/endpoint/protocols/openai/responses?
+    api-version={{Foundry_ApiVersion}}
+Authorization: ******
+Content-Type: application/json
+
+{
+  "input": "5 adet Defter sipariş etmek istiyorum.",
+  "store": false
+}
+
+###

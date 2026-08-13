@@ -3,6 +3,7 @@
         <Project Path="AdvancedAgentDeploy/AdvancedAgentDeploy.csproj" />
         <Project Path="AgentConsumer/AgentConsumer.csproj" />
         <Project Path="SimpleAgentDeploy/SimpleAgentDeploy.csproj" />
+        <Project Path="WorkflowAgentDeploy/WorkflowAgentDeploy.csproj" />
     </Folder>
     <Project Path="App.API/App.API.csproj" />
     <Project Path="ConsoleApp/App.Console.csproj" />
